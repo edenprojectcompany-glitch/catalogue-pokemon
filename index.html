@@ -234,6 +234,86 @@ main{position:relative;z-index:5;padding:0 16px 140px;max-width:1200px;margin:0 
 .profile-success{display:none;text-align:center;padding:10px;margin-top:10px;border-radius:var(--rs);background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#4ade80;font-size:.85rem}
 .profile-divider{height:1px;background:rgba(255,133,161,.1);margin:6px 0 20px}
 
+
+/* COUPON IN CART */
+.cart-coupon-row{padding:0 16px 10px;display:flex;gap:6px}
+.cart-coupon-input{flex:1;padding:9px 12px;border:1.5px solid rgba(255,133,161,.25);border-radius:50px;background:rgba(255,255,255,.05);font-family:'Zen Kaku Gothic New',sans-serif;font-size:12px;color:#fff;outline:none;transition:border-color .2s}
+.cart-coupon-input:focus{border-color:var(--sakura-300)}
+.cart-coupon-input::placeholder{color:rgba(255,179,198,.35)}
+.cart-coupon-btn{padding:9px 14px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--gold),#b8860b);color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s}
+.cart-coupon-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(201,168,76,.4)}
+.cart-coupon-applied{padding:6px 16px 10px;font-size:11px;color:#4ade80;display:none}
+.cart-discount-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.cart-discount-lbl{color:rgba(74,222,128,.7);font-size:11px;letter-spacing:.08em}
+.cart-discount-val{color:#4ade80;font-size:14px;font-weight:700}
+
+/* MONDIAL RELAY MODAL */
+#mr-overlay{position:fixed;inset:0;background:rgba(10,5,20,.96);z-index:650;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:16px}
+#mr-overlay.open{opacity:1;pointer-events:all}
+.mr-modal{background:linear-gradient(135deg,#1a0d20,#0d0a1a);border:1px solid rgba(255,133,161,.3);border-radius:var(--r);width:min(96vw,720px);max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 24px 80px rgba(180,40,100,.4);position:relative}
+.mr-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,133,161,.2);font-size:16px;color:rgba(255,179,198,.6);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mr-close:hover{background:var(--sakura-300);color:#fff}
+.mr-title{font-family:'Noto Serif JP',serif;font-size:1.2rem;color:#fff;margin-bottom:4px}
+.mr-sub{font-size:.82rem;color:rgba(255,179,198,.5);margin-bottom:18px}
+.mr-search-row{display:flex;gap:8px;margin-bottom:16px}
+.mr-search-input{flex:1;padding:11px 14px;border:1.5px solid rgba(255,133,161,.25);border-radius:50px;background:rgba(255,255,255,.05);font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px;color:#fff;outline:none}
+.mr-search-input:focus{border-color:var(--sakura-300)}
+.mr-search-input::placeholder{color:rgba(255,179,198,.3)}
+.mr-search-btn{padding:11px 20px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--sakura-300),var(--sakura-400));color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.mr-tabs{display:flex;gap:8px;margin-bottom:14px}
+.mr-tab{padding:7px 16px;border-radius:50px;border:1.5px solid rgba(255,133,161,.25);background:transparent;color:rgba(255,179,198,.6);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Zen Kaku Gothic New',sans-serif}
+.mr-tab.active{background:var(--sakura-300);color:#fff;border-color:var(--sakura-300)}
+.mr-map-wrap{width:100%;height:280px;border-radius:var(--rs);overflow:hidden;margin-bottom:14px;border:1px solid rgba(255,133,161,.2)}
+.mr-map-wrap iframe{width:100%;height:100%;border:none}
+.mr-list{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;margin-bottom:14px}
+.mr-point{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid rgba(255,133,161,.15);border-radius:var(--rs);background:rgba(255,255,255,.03);cursor:pointer;transition:all .2s}
+.mr-point:hover,.mr-point.selected{border-color:var(--sakura-300);background:rgba(255,133,161,.08)}
+.mr-point-icon{font-size:1.4rem;flex-shrink:0}
+.mr-point-info{flex:1}
+.mr-point-name{font-size:.88rem;font-weight:700;color:#fff;margin-bottom:2px}
+.mr-point-addr{font-size:.75rem;color:rgba(255,179,198,.5)}
+.mr-point-hours{font-size:.72rem;color:rgba(255,179,198,.4);margin-top:2px}
+.mr-point-radio{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,133,161,.3);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.mr-point.selected .mr-point-radio{border-color:var(--sakura-300);background:var(--sakura-300)}
+.mr-confirm-btn{width:100%;padding:13px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--sakura-300),var(--sakura-400));color:#fff;font-family:'Zen Kaku Gothic New',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 0 18px rgba(255,77,109,.4);transition:all .25s}
+.mr-confirm-btn:hover{transform:translateY(-2px);box-shadow:0 0 28px rgba(255,77,109,.7)}
+.mr-confirm-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.mr-selected-display{display:none;padding:10px 14px;border-radius:var(--rs);background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);margin-bottom:10px;font-size:.82rem;color:#4ade80}
+.btn-mr{background:linear-gradient(135deg,#0057b8,#003f8a);color:#fff;border:1px solid rgba(0,120,255,.3);box-shadow:0 0 14px rgba(0,87,184,.4)}
+.btn-mr:hover{box-shadow:0 0 24px rgba(0,87,184,.7)}
+
+/* WHEEL POPUP after login */
+#wheel-popup-overlay{position:fixed;inset:0;background:rgba(10,5,20,.97);z-index:700;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s;padding:20px}
+#wheel-popup-overlay.open{opacity:1;pointer-events:all}
+.wheel-popup{background:linear-gradient(135deg,#1a0d20,#0d0a1a);border:1px solid rgba(255,133,161,.4);border-radius:var(--r);width:min(94vw,460px);padding:32px 28px;box-shadow:0 24px 80px rgba(180,40,100,.5),0 0 60px rgba(255,77,109,.15);text-align:center;position:relative;animation:popup-in .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popup-in{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.wheel-popup-icon{font-size:3rem;margin-bottom:12px;display:block;animation:spin-in 1s cubic-bezier(.34,1.56,.64,1)}
+@keyframes spin-in{from{transform:rotate(-180deg) scale(0)}to{transform:rotate(0) scale(1)}}
+.wheel-popup h2{font-family:'Noto Serif JP',serif;font-size:1.4rem;color:#fff;margin-bottom:8px}
+.wheel-popup p{font-size:.88rem;color:rgba(255,179,198,.7);margin-bottom:22px;line-height:1.6}
+.wheel-popup-btn{width:100%;padding:14px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--sakura-300),var(--sakura-400));color:#fff;font-family:'Zen Kaku Gothic New',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 0 22px rgba(255,77,109,.55),0 4px 18px rgba(255,77,109,.4);animation:signup-pulse 2.5s ease-in-out infinite;margin-bottom:10px}
+.wheel-popup-skip{background:none;border:none;color:rgba(255,179,198,.4);font-size:.8rem;cursor:pointer;font-family:'Zen Kaku Gothic New',sans-serif;padding:6px}
+.wheel-popup-skip:hover{color:rgba(255,179,198,.7)}
+
+/* ADMIN TABS */
+.admin-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.admin-tab-btn{padding:8px 16px;border-radius:50px;border:1.5px solid rgba(255,179,198,.25);background:transparent;color:var(--ink-m);font-family:'Zen Kaku Gothic New',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+.admin-tab-btn.active{background:var(--sakura-300);color:#fff;border-color:var(--sakura-300)}
+.admin-tab-content{display:none}
+.admin-tab-content.active{display:block}
+.admin-stock-table{width:100%;border-collapse:collapse;font-size:13px}
+.admin-stock-table th{text-align:left;padding:8px 10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-m);border-bottom:1px solid rgba(255,179,198,.15)}
+.admin-stock-table td{padding:8px 10px;border-bottom:1px solid rgba(255,179,198,.08)}
+.admin-stock-input{width:70px;padding:5px 8px;border:1.5px solid rgba(255,179,198,.2);border-radius:var(--rs);font-size:13px;font-family:'Zen Kaku Gothic New',sans-serif;outline:none;background:rgba(255,255,255,.05);color:var(--ink)}
+.admin-stock-input:focus{border-color:var(--sakura-300)}
+.stock-bar-wrap{width:80px;height:8px;background:rgba(255,255,255,.1);border-radius:50px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px}
+.stock-bar{height:100%;border-radius:50px;transition:width .3s}
+.admin-wheel-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,179,198,.08)}
+.admin-wheel-color{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.admin-wheel-label{flex:1;font-size:13px;color:var(--ink)}
+.admin-wheel-input{width:60px;padding:5px 8px;border:1.5px solid rgba(255,179,198,.2);border-radius:var(--rs);font-size:13px;font-family:'Zen Kaku Gothic New',sans-serif;outline:none;background:rgba(255,255,255,.05);color:var(--ink);text-align:center}
+.admin-wheel-input:focus{border-color:var(--sakura-300)}
+
 /* CART */
 #cart-panel{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:100;width:min(96vw,500px);background:linear-gradient(135deg,#1a0d20,#0d0a1a);border:1px solid rgba(255,133,161,.3);border-radius:var(--r);box-shadow:0 16px 60px rgba(180,40,100,.4),0 0 0 1px rgba(255,133,161,.1);overflow:hidden;transition:all .4s cubic-bezier(.23,1,.32,1)}
 #cart-panel.hidden{transform:translateX(-50%) translateY(135%);opacity:0;pointer-events:none}
@@ -708,7 +788,16 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
   </div>
   <div class="cart-body" id="cart-body">
     <div class="cart-list" id="cart-list"></div>
+    <div class="cart-coupon-row">
+      <input class="cart-coupon-input" id="cart-coupon-input" type="text" placeholder="Code promo..." onkeydown="if(event.key==='Enter')applyCoupon()">
+      <button class="cart-coupon-btn" onclick="applyCoupon()">Appliquer</button>
+    </div>
+    <div class="cart-coupon-applied" id="cart-coupon-applied"></div>
     <div class="cart-footer">
+      <div class="cart-discount-row" id="cart-discount-row" style="display:none">
+        <span class="cart-discount-lbl">🎟️ Réduction appliquée</span>
+        <span class="cart-discount-val" id="cart-discount-val">-0 €</span>
+      </div>
       <div class="cart-total-row">
         <span class="cart-total-lbl" data-t="total">Total commande</span>
         <span class="cart-total-val" id="cart-total">0 €</span>
@@ -717,6 +806,7 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
     </div>
     <div class="cart-actions">
       <button class="act-btn btn-pay" onclick="openStripePayment()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg> Payer par carte</button>
+      <button class="act-btn btn-mr" onclick="openMondialRelay()">📦 Point Relais</button>
       <button class="act-btn btn-wa" onclick="sendWA()"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> <span data-t="whatsapp">Commander via WhatsApp</span></button>
       <button class="act-btn btn-em" onclick="sendEmail()"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> <span data-t="email">Commander par Email</span></button>
     </div>
@@ -739,9 +829,24 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
       <div class="admin-err" id="admin-err" data-t="wrongPw">Mot de passe incorrect.</div>
     </div>
     <div id="admin-content" style="display:none">
-      <div id="admin-fields"></div>
-      <button class="admin-save-btn" onclick="saveAdmin()" data-t="adminSave">&#x2713; Sauvegarder</button>
-      <button class="admin-close-btn" onclick="closeAdmin()" data-t="adminClose">Fermer</button>
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" onclick="switchAdminTab('prices')">💰 Prix & eBay</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('stocks')">📦 Stocks</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('wheel')">🎡 Roue</button>
+      </div>
+      <div id="admin-tab-prices" class="admin-tab-content active">
+        <div id="admin-fields"></div>
+        <button class="admin-save-btn" onclick="saveAdmin()">✓ Sauvegarder les prix</button>
+      </div>
+      <div id="admin-tab-stocks" class="admin-tab-content">
+        <div id="admin-stock-fields"></div>
+        <button class="admin-save-btn" onclick="saveStockAdmin()">✓ Sauvegarder les stocks</button>
+      </div>
+      <div id="admin-tab-wheel" class="admin-tab-content">
+        <div id="admin-wheel-fields"></div>
+        <button class="admin-save-btn" onclick="saveWheelAdmin()">✓ Sauvegarder la roue</button>
+      </div>
+      <button class="admin-close-btn" onclick="closeAdmin()" style="margin-top:10px">Fermer</button>
     </div>
   </div>
 </div>
@@ -1325,8 +1430,12 @@ function renderCart(){
 
 function orderTxt(){
   const items=Object.values(cart);
-  return items.map(i=>'- '+i.p.ref+' : '+i.q+' bo\u00eete(s) \u00d7 '+i.pr+'\u20ac = '+(i.pr*i.q)+'\u20ac').join('\n')
-    +'\n\nTOTAL : '+items.reduce((s,i)=>s+i.pr*i.q,0)+'\u20ac\nLivraison : Gratuite en France / 5,99\u20ac en Europe (gratuite \u00e0 partir d\'1 display)';
+  const {total, discount} = getCartTotal();
+  let txt = items.map(i=>'- '+i.p.ref+' : '+i.q+' bo\u00eete(s) \u00d7 '+i.pr+'\u20ac = '+(i.pr*i.q)+'\u20ac').join('\n');
+  if (discount > 0 && activeCoupon) txt += '\n🎟️ Code promo '+activeCoupon.code+' : -'+discount+'\u20ac';
+  txt += '\n\nTOTAL : '+total+'\u20ac\nLivraison : Gratuite en France / 5,99\u20ac en Europe';
+  if (window.selectedRelayPoint) txt += '\n📦 Point Relais : '+window.selectedRelayPoint.name+' — '+window.selectedRelayPoint.addr;
+  return txt;
 }
 
 // ── DETAIL MODAL ──────────────────────────────────────────────────────────────
@@ -1557,6 +1666,7 @@ function doLogin() {
   updateWheelBanner();
   updateCouponStrip();
   showToast('Bienvenue ' + user.prenom + ' ! 🌸');
+  showWheelPopupIfEligible(user);
 }
 
 function doSignup() {
@@ -1599,6 +1709,7 @@ function doSignup() {
   updateWheelBanner();
   updateCouponStrip();
   showToast('Compte créé, ' + prenom + ' ! 🌸');
+  showWheelPopupIfEligible(newUser);
 }
 
 function doLogout() {
@@ -1957,6 +2068,45 @@ updateCouponStrip();
   </div>
 </div>
 
+
+<!-- WHEEL POPUP after login -->
+<div id="wheel-popup-overlay">
+  <div class="wheel-popup">
+    <span class="wheel-popup-icon">🎡</span>
+    <h2>Votre tentative vous attend !</h2>
+    <p>Bienvenue ! Vous avez une tentative disponible sur la <strong style="color:var(--sakura-300)">Roue de la Fortune Eden</strong>.<br>Tentez de gagner jusqu'à une display offerte !</p>
+    <button class="wheel-popup-btn" onclick="closeWheelPopup();openWheel()">🎰 Tourner maintenant !</button>
+    <button class="wheel-popup-skip" onclick="closeWheelPopup()">Plus tard →</button>
+  </div>
+</div>
+
+<!-- MONDIAL RELAY MODAL -->
+<div id="mr-overlay">
+  <div class="mr-modal">
+    <button class="mr-close" onclick="closeMondialRelay()">✕</button>
+    <div class="mr-title">📦 Choisir un point de retrait</div>
+    <div class="mr-sub">Mondial Relay — Livraison 2-5 jours · à partir de 3,99€</div>
+    <div class="mr-search-row">
+      <input class="mr-search-input" id="mr-search-input" type="text" placeholder="Code postal ou ville..." onkeydown="if(event.key==='Enter')searchMondialRelay()">
+      <button class="mr-search-btn" onclick="searchMondialRelay()">Rechercher</button>
+    </div>
+    <div class="mr-tabs">
+      <button class="mr-tab active" id="mr-tab-relais" onclick="switchMRTab('relais')">🏪 Points Relais</button>
+      <button class="mr-tab" id="mr-tab-locker" onclick="switchMRTab('locker')">🔒 Lockers 24/7</button>
+    </div>
+    <div class="mr-map-wrap" id="mr-map-wrap">
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,179,198,.4);font-size:.85rem">
+        🔍 Recherchez un code postal pour voir la carte
+      </div>
+    </div>
+    <div class="mr-list" id="mr-list">
+      <div style="text-align:center;padding:20px;color:rgba(255,179,198,.4);font-size:.85rem">Entrez un code postal pour trouver les points proches</div>
+    </div>
+    <div class="mr-selected-display" id="mr-selected-display"></div>
+    <button class="mr-confirm-btn" id="mr-confirm-btn" onclick="confirmMondialRelay()" disabled>Choisir ce point de retrait</button>
+  </div>
+</div>
+
 <!-- STRIPE PAYMENT MODAL -->
 <div id="stripe-overlay">
   <div class="stripe-modal">
@@ -2110,6 +2260,263 @@ function saveProfile() {
 document.getElementById('profile-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeProfile();
 });
+
+
+// ══════════════════════════════════════════════════════════════════
+// COUPON SYSTEM
+// ══════════════════════════════════════════════════════════════════
+let activeCoupon = null;
+
+function getCouponDiscount(code, total) {
+  // Check wheel coupons from user
+  const user = DB.getCurrent();
+  if (user && user.coupon && !user.coupon.used && user.coupon.code === code.toUpperCase()) {
+    const c = user.coupon;
+    if (c.minAchat && total < c.minAchat) return { error: `Minimum d'achat : ${c.minAchat}€` };
+    const pct = parseInt(c.desc);
+    if (pct) return { pct, desc: c.desc, code: c.code };
+  }
+  // Check admin custom coupons
+  const adminCoupons = JSON.parse(localStorage.getItem('eden_coupons') || '[]');
+  const found = adminCoupons.find(c => c.code === code.toUpperCase() && c.active);
+  if (found) {
+    if (found.minAchat && total < found.minAchat) return { error: `Minimum d'achat : ${found.minAchat}€` };
+    return { pct: found.pct, desc: found.pct + '% de réduction', code: found.code };
+  }
+  return null;
+}
+
+function applyCoupon() {
+  const code = document.getElementById('cart-coupon-input').value.trim();
+  const appliedEl = document.getElementById('cart-coupon-applied');
+  if (!code) return;
+  const items = Object.values(cart);
+  const subtotal = items.reduce((s, i) => s + i.pr * i.q, 0);
+  const result = getCouponDiscount(code, subtotal);
+  if (!result) {
+    appliedEl.style.display = 'block';
+    appliedEl.style.color = '#ff85a1';
+    appliedEl.textContent = '❌ Code invalide ou expiré';
+    activeCoupon = null;
+  } else if (result.error) {
+    appliedEl.style.display = 'block';
+    appliedEl.style.color = '#ff85a1';
+    appliedEl.textContent = '⚠️ ' + result.error;
+    activeCoupon = null;
+  } else {
+    activeCoupon = result;
+    appliedEl.style.display = 'block';
+    appliedEl.style.color = '#4ade80';
+    appliedEl.textContent = '✅ Code ' + result.code + ' appliqué — ' + result.desc;
+  }
+  renderCart();
+}
+
+function getCartTotal() {
+  const items = Object.values(cart);
+  const subtotal = items.reduce((s, i) => s + i.pr * i.q, 0);
+  if (activeCoupon) {
+    const discount = Math.round(subtotal * activeCoupon.pct / 100);
+    return { subtotal, discount, total: subtotal - discount };
+  }
+  return { subtotal, discount: 0, total: subtotal };
+}
+
+// ══════════════════════════════════════════════════════════════════
+// WHEEL POPUP after login/signup
+// ══════════════════════════════════════════════════════════════════
+function showWheelPopupIfEligible(user) {
+  if (!user) return;
+  if (!canSpin(user)) return;
+  setTimeout(() => {
+    document.getElementById('wheel-popup-overlay').classList.add('open');
+  }, 800);
+}
+
+function closeWheelPopup() {
+  document.getElementById('wheel-popup-overlay').classList.remove('open');
+}
+
+document.getElementById('wheel-popup-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeWheelPopup();
+});
+
+// ══════════════════════════════════════════════════════════════════
+// MONDIAL RELAY
+// ══════════════════════════════════════════════════════════════════
+let mrSelectedPoint = null;
+let mrCurrentTab = 'relais';
+const MR_POINTS_MOCK = {
+  relais: [
+    { id:'MR001', name:'Tabac Presse du Centre', addr:'12 rue de la République', cp:'', ville:'', hours:'Lun-Sam 7h-20h', icon:'🏪', lat:48.85, lng:2.35 },
+    { id:'MR002', name:'Pharmacie Saint-Michel', addr:'5 avenue des Fleurs', cp:'', ville:'', hours:'Lun-Ven 9h-19h, Sam 9h-13h', icon:'💊', lat:48.851, lng:2.351 },
+    { id:'MR003', name:'Carrefour Express', addr:'28 boulevard Victor Hugo', cp:'', ville:'', hours:'Lun-Dim 7h-22h', icon:'🛒', lat:48.852, lng:2.349 },
+    { id:'MR004', name:'Pressing du Marché', addr:'3 place du Marché', cp:'', ville:'', hours:'Mar-Sam 9h-18h', icon:'👕', lat:48.849, lng:2.352 },
+    { id:'MR005', name:'Librairie Culturelle', addr:'67 rue Nationale', cp:'', ville:'', hours:'Lun-Sam 9h-19h30', icon:'📚', lat:48.848, lng:2.348 },
+  ],
+  locker: [
+    { id:'LK001', name:'Locker Gare SNCF', addr:'Parvis de la Gare', cp:'', ville:'', hours:'24h/7j', icon:'🔒', lat:48.853, lng:2.346 },
+    { id:'LK002', name:'Locker Centre Commercial', addr:'Galerie du Soleil — Entrée A', cp:'', ville:'', hours:'Lun-Dim 8h-22h', icon:'🔒', lat:48.847, lng:2.353 },
+    { id:'LK003', name:'Locker Parking Mairie', addr:'Parking Souterrain — Niveau 0', cp:'', ville:'', hours:'24h/7j', icon:'🔒', lat:48.854, lng:2.347 },
+  ]
+};
+
+function openMondialRelay() {
+  mrSelectedPoint = null;
+  document.getElementById('mr-confirm-btn').disabled = true;
+  document.getElementById('mr-selected-display').style.display = 'none';
+  document.getElementById('mr-overlay').classList.add('open');
+}
+
+function closeMondialRelay() {
+  document.getElementById('mr-overlay').classList.remove('open');
+}
+
+function switchMRTab(tab) {
+  mrCurrentTab = tab;
+  document.getElementById('mr-tab-relais').classList.toggle('active', tab === 'relais');
+  document.getElementById('mr-tab-locker').classList.toggle('active', tab === 'locker');
+  renderMRPoints(document.getElementById('mr-search-input').value.trim());
+}
+
+function searchMondialRelay() {
+  const cp = document.getElementById('mr-search-input').value.trim();
+  if (!cp) return;
+  // Update mock points with searched CP/ville
+  const mapWrap = document.getElementById('mr-map-wrap');
+  mapWrap.innerHTML = `<iframe src="https://www.google.com/maps/embed/v1/search?q=point+relais+mondial+relay+${encodeURIComponent(cp)}&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU3s_o" allowfullscreen></iframe>`;
+  renderMRPoints(cp);
+}
+
+function renderMRPoints(cp) {
+  const list = document.getElementById('mr-list');
+  const points = MR_POINTS_MOCK[mrCurrentTab].map(p => ({...p, cp, ville: cp}));
+  list.innerHTML = '';
+  points.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'mr-point' + (mrSelectedPoint && mrSelectedPoint.id === p.id ? ' selected' : '');
+    div.innerHTML = `
+      <div class="mr-point-icon">${p.icon}</div>
+      <div class="mr-point-info">
+        <div class="mr-point-name">${p.name}</div>
+        <div class="mr-point-addr">${p.addr}${cp ? ' — ' + cp : ''}</div>
+        <div class="mr-point-hours">⏰ ${p.hours}</div>
+      </div>
+      <div class="mr-point-radio">${mrSelectedPoint && mrSelectedPoint.id === p.id ? '✓' : ''}</div>
+    `;
+    div.onclick = () => selectMRPoint({...p, cp});
+    list.appendChild(div);
+  });
+}
+
+function selectMRPoint(point) {
+  mrSelectedPoint = point;
+  document.getElementById('mr-confirm-btn').disabled = false;
+  renderMRPoints(point.cp);
+}
+
+function confirmMondialRelay() {
+  if (!mrSelectedPoint) return;
+  const display = document.getElementById('mr-selected-display');
+  display.style.display = 'block';
+  display.textContent = '✅ Point sélectionné : ' + mrSelectedPoint.name + ' — ' + mrSelectedPoint.addr;
+  closeMondialRelay();
+  showToast('📦 Point relais choisi : ' + mrSelectedPoint.name);
+  // Store in cart for order
+  window.selectedRelayPoint = mrSelectedPoint;
+}
+
+document.getElementById('mr-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeMondialRelay();
+});
+
+// ══════════════════════════════════════════════════════════════════
+// ADMIN TABS + STOCK + WHEEL ADMIN
+// ══════════════════════════════════════════════════════════════════
+function switchAdminTab(tab) {
+  document.querySelectorAll('.admin-tab-btn').forEach((b,i) => {
+    const tabs = ['prices','stocks','wheel'];
+    b.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('admin-tab-' + tab).classList.add('active');
+  if (tab === 'stocks') buildStockAdmin();
+  if (tab === 'wheel') buildWheelAdmin();
+}
+
+function buildStockAdmin() {
+  const c = document.getElementById('admin-stock-fields');
+  let html = '<table class="admin-stock-table"><thead><tr><th>Produit</th><th>Stock FR</th><th>Stock Asie</th><th>Visuel</th></tr></thead><tbody>';
+  CAT.forEach(p => {
+    const s = STOCK[p.id] || {fr:0, asia:0};
+    const maxFr = Math.max(s.fr, 20);
+    const pctFr = Math.min(100, Math.round(s.fr / maxFr * 100));
+    const color = s.fr === 0 ? '#ef4444' : s.fr < 5 ? '#f97316' : '#22c55e';
+    html += `<tr>
+      <td style="font-size:12px;font-weight:600">${p.ref}</td>
+      <td><input class="admin-stock-input" id="asf-${p.id}" type="number" value="${s.fr}" min="0"></td>
+      <td><input class="admin-stock-input" id="asa-${p.id}" type="number" value="${s.asia}" min="0"></td>
+      <td><div class="stock-bar-wrap"><div class="stock-bar" style="width:${pctFr}%;background:${color}"></div></div><span style="font-size:11px;color:${color}">${s.fr}</span></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  c.innerHTML = html;
+}
+
+function saveStockAdmin() {
+  CAT.forEach(p => {
+    const fr = parseInt(document.getElementById('asf-'+p.id)?.value) || 0;
+    const asia = parseInt(document.getElementById('asa-'+p.id)?.value) || 0;
+    if (!STOCK[p.id]) STOCK[p.id] = {fr:0,asia:0};
+    STOCK[p.id].fr = fr;
+    STOCK[p.id].asia = asia;
+  });
+  saveStock();
+  renderGrid();
+  showToast('📦 Stocks sauvegardés !');
+}
+
+// Load wheel segs from localStorage if admin saved them
+function loadWheelSegs() {
+  const saved = localStorage.getItem('eden_wheel_segs');
+  if (saved) {
+    try {
+      const s = JSON.parse(saved);
+      s.forEach((seg, i) => { if (WHEEL_SEGS[i]) { WHEEL_SEGS[i].prob = seg.prob; WHEEL_SEGS[i].label = seg.label; WHEEL_SEGS[i].desc = seg.desc; } });
+    } catch(e) {}
+  }
+}
+loadWheelSegs();
+
+function buildWheelAdmin() {
+  const c = document.getElementById('admin-wheel-fields');
+  let html = '<div style="font-size:11px;color:var(--ink-m);margin-bottom:12px;letter-spacing:.04em">Modifiez les % de réduction et probabilités de chaque case. Probabilité plus haute = plus de chances.</div>';
+  WHEEL_SEGS.forEach((seg, i) => {
+    html += `<div class="admin-wheel-row">
+      <div class="admin-wheel-color" style="background:${seg.color}"></div>
+      <div class="admin-wheel-label">
+        <input class="admin-wheel-input" style="width:70px;margin-right:6px" id="wl-${i}" value="${seg.label}" placeholder="Label">
+        <input class="admin-wheel-input" style="width:120px" id="wd-${i}" value="${seg.desc}" placeholder="Description">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-m)">
+        Prob: <input class="admin-wheel-input" id="wp-${i}" type="number" value="${seg.prob}" min="0.1" step="0.1" style="width:60px">
+      </div>
+    </div>`;
+  });
+  c.innerHTML = html;
+}
+
+function saveWheelAdmin() {
+  const segs = WHEEL_SEGS.map((seg, i) => ({
+    ...seg,
+    label: document.getElementById('wl-'+i)?.value || seg.label,
+    desc: document.getElementById('wd-'+i)?.value || seg.desc,
+    prob: parseFloat(document.getElementById('wp-'+i)?.value) || seg.prob
+  }));
+  segs.forEach((s, i) => { WHEEL_SEGS[i].label = s.label; WHEEL_SEGS[i].desc = s.desc; WHEEL_SEGS[i].prob = s.prob; });
+  localStorage.setItem('eden_wheel_segs', JSON.stringify(segs.map(s => ({label:s.label,desc:s.desc,prob:s.prob}))));
+  showToast('🎡 Roue sauvegardée !');
+}
 
 document.getElementById('stripe-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeStripe();
