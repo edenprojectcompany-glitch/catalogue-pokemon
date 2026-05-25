@@ -1920,5 +1920,90 @@ updateCouponStrip();
   </div>
 </div>
 
+<script>
+// ══════════════════════════════════════════════════════
+// STRIPE PAYMENT
+// ══════════════════════════════════════════════════════
+const STRIPE_PK = 'pk_live_51BrnndJwQ3fowDgxPubsf0CFPy9mWuZBEahgh0UMAaUeIAs3qcSx1gG3tThPnApmTkbyuig5Z3Vhkm9GluZGSuyy00bthfqERW';
+let stripeInstance = null, stripeCardElement = null;
+
+function initStripe() {
+  if (stripeInstance) return;
+  if (typeof Stripe === 'undefined') { console.error('Stripe.js non chargé'); return; }
+  stripeInstance = Stripe(STRIPE_PK);
+  const elements = stripeInstance.elements();
+  stripeCardElement = elements.create('card', {
+    style: {
+      base: { fontFamily: 'Zen Kaku Gothic New, sans-serif', fontSize: '15px', color: '#ffffff', '::placeholder': { color: 'rgba(255,179,198,0.45)' } },
+      invalid: { color: '#ff85a1' }
+    },
+    hidePostalCode: true
+  });
+  stripeCardElement.mount('#stripe-card-element');
+  stripeCardElement.on('change', e => {
+    document.getElementById('stripe-card-errors').textContent = e.error ? e.error.message : '';
+  });
+}
+
+function openStripePayment() {
+  const items = Object.values(cart);
+  if (!items.length) { showToast('Votre panier est vide 🌸'); return; }
+  const total = items.reduce((s, i) => s + i.pr * i.q, 0);
+  document.getElementById('stripe-amount-display').textContent = total + ' €';
+  document.getElementById('stripe-overlay').classList.add('open');
+  setTimeout(initStripe, 150);
+}
+
+function closeStripe() {
+  document.getElementById('stripe-overlay').classList.remove('open');
+}
+
+async function submitStripePayment() {
+  const btn = document.getElementById('stripe-pay-btn');
+  const errEl = document.getElementById('stripe-card-errors');
+  if (!stripeInstance || !stripeCardElement) { errEl.textContent = 'Erreur initialisation Stripe.'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Traitement...';
+  errEl.textContent = '';
+  try {
+    const items = Object.values(cart);
+    const total = items.reduce((s, i) => s + i.pr * i.q, 0);
+    const user = DB.getCurrent();
+    const resp = await fetch('/api/create-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: total, currency: 'eur',
+        customer: user ? { name: user.prenom + ' ' + user.nom, email: user.email } : {},
+        items: items.map(i => ({ ref: i.p.ref, qty: i.q, price: i.pr }))
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    const { error, paymentIntent } = await stripeInstance.confirmCardPayment(data.clientSecret, {
+      payment_method: { card: stripeCardElement }
+    });
+    if (error) {
+      errEl.textContent = error.message;
+      btn.disabled = false;
+      btn.innerHTML = '🔒 Payer maintenant';
+    } else if (paymentIntent.status === 'succeeded') {
+      closeStripe();
+      cart = {}; renderCart();
+      document.getElementById('cart-panel').classList.add('hidden');
+      showToast('✅ Paiement réussi ! Commande confirmée 🌸');
+    }
+  } catch (err) {
+    errEl.textContent = 'Erreur : ' + err.message;
+    btn.disabled = false;
+    btn.innerHTML = '🔒 Payer maintenant';
+  }
+}
+
+document.getElementById('stripe-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeStripe();
+});
+</script>
+
 </body>
 </html>
