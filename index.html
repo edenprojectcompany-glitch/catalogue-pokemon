@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="fr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -465,7 +465,7 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
   <div class="topbar-actions">
     <button class="lang-btn active" id="lb-fr" onclick="setLang('fr')">FR</button>
     <button class="lang-btn" id="lb-en" onclick="setLang('en')">EN</button>
-    <button class="dark-btn" id="dark-toggle" onclick="toggleDark()" title="Mode sombre">☽</button>
+    <button class="dark-btn" id="dark-toggle" onclick="toggleDark()" title="Mode sombre">☀</button>
     <div id="auth-header-area" style="display:flex;align-items:center;gap:8px">
       <button class="auth-header-btn auth-login-btn" onclick="openAuth('login')">🔑 Connexion</button>
       <button class="auth-header-btn auth-signup-btn" onclick="openAuth('signup')">✨ S'inscrire</button>
@@ -1025,7 +1025,7 @@ let lang='fr';
 function t(k){return T[lang][k]||T.fr[k]||k;}
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-let cart={}, cartOpen=false, curFilter='all', searchQ='', darkMode=false;
+let cart={}, cartOpen=false, curFilter='all', searchQ='', darkMode=true;
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function getPrice(p,q){let v=p.t[0].p;for(const t of p.t)if(q>=t.q&&t.p!==null)v=t.p;return v;}
