@@ -577,6 +577,11 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
 .stripe-pay-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
 .stripe-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,133,161,.2);font-size:16px;color:rgba(255,179,198,.6);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .stripe-close:hover{background:var(--sakura-300);color:#fff}
+
+.stripe-delivery-btn{padding:7px 12px;border-radius:50px;border:1.5px solid rgba(255,133,161,.2);background:transparent;color:rgba(255,179,198,.6);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Zen Kaku Gothic New',sans-serif}
+.stripe-delivery-btn.active{background:var(--sakura-300);color:#fff;border-color:var(--sakura-300);box-shadow:0 0 10px rgba(255,77,109,.3)}
+.stripe-delivery-btn:hover{border-color:rgba(255,133,161,.5);color:#ffb3c6}
+
 .stripe-secure{text-align:center;font-size:.72rem;color:rgba(255,179,198,.45);margin-top:12px;display:flex;align-items:center;justify-content:center;gap:5px}
 .cart-actions .btn-pay{background:linear-gradient(135deg,#635bff,#4f46e5);color:#fff;border:1px solid rgba(99,91,255,.4);box-shadow:0 0 14px rgba(99,91,255,.4)}
 .cart-actions .btn-pay:hover{background:linear-gradient(135deg,#4f46e5,#3730a3);box-shadow:0 4px 14px rgba(99,91,255,.4)}
@@ -806,9 +811,8 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
     </div>
     <div class="cart-actions">
       <button class="act-btn btn-pay" onclick="openStripePayment()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg> Payer par carte</button>
-      <button class="act-btn btn-mr" onclick="openMondialRelay()">📦 Point Relais</button>
-      <button class="act-btn btn-wa" onclick="sendWA()"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> <span data-t="whatsapp">Commander via WhatsApp</span></button>
-      <button class="act-btn btn-em" onclick="sendEmail()"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> <span data-t="email">Commander par Email</span></button>
+      <button class="act-btn btn-wa" onclick="sendWA()"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> <span>💬 Devis / Question WhatsApp</span></button>
+      <button class="act-btn btn-em" onclick="sendEmail()"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> <span>✉️ Devis / Question Email</span></button>
     </div>
   </div>
 </div>
@@ -1401,16 +1405,13 @@ function calcShipping(){
 function renderCart(){
   const items=Object.values(cart);
   document.getElementById('cart-count').textContent=items.length;
-  const subtotal=items.reduce((s,i)=>s+i.pr*i.q,0);
-
-  // Shipping logic
-  let shipping=5.99;
-  // Free if any display box ordered (qty >= 1 always = 1 display)
-  // Actually all products are displays, so shipping is always free for EU once ordered
-  // But free in France always
-  shipping=0; // We show the shipping info separately, actual cost depends on country
-
-  document.getElementById('cart-total').textContent=subtotal+' \u20ac';
+  const {subtotal, discount, total} = getCartTotal();
+  // Discount row
+  const discRow = document.getElementById('cart-discount-row');
+  if (discRow) discRow.style.display = discount > 0 ? 'flex' : 'none';
+  const discVal = document.getElementById('cart-discount-val');
+  if (discVal && discount > 0) discVal.textContent = '-' + discount + ' € (' + activeCoupon.pct + '%)';
+  document.getElementById('cart-total').textContent=total+' \u20ac';
   document.getElementById('cart-shipping-info').textContent=t('shippingFr')+' / '+t('shippingEu');
 
   const list=document.getElementById('cart-list');
@@ -2117,6 +2118,25 @@ updateCouponStrip();
       <span class="stripe-amount-label">Total commande</span>
       <span class="stripe-amount-value" id="stripe-amount-display">0 €</span>
     </div>
+    <!-- STEP 1: Relay choice -->
+    <div id="stripe-step-relay" style="margin-bottom:14px">
+      <div style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,179,198,.5);margin-bottom:8px;font-weight:600">📦 Livraison</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="stripe-delivery-btn active" id="btn-delivery-home" onclick="selectDelivery('home')">🏠 Domicile</button>
+        <button class="stripe-delivery-btn" id="btn-delivery-relay" onclick="selectDelivery('relay')">📦 Point Relais</button>
+        <button class="stripe-delivery-btn" id="btn-delivery-locker" onclick="selectDelivery('locker')">🔒 Locker 24/7</button>
+      </div>
+      <div id="stripe-relay-search" style="display:none;margin-bottom:10px">
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input class="profile-input" id="stripe-cp-input" type="text" placeholder="Code postal..." style="flex:1;padding:9px 12px;font-size:13px" onkeydown="if(event.key==='Enter')searchRelayInStripe()">
+          <button onclick="searchRelayInStripe()" style="padding:9px 14px;border:none;border-radius:50px;background:var(--sakura-300);color:#fff;font-weight:700;font-size:12px;cursor:pointer">Chercher</button>
+        </div>
+        <div id="stripe-relay-list" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+      <div id="stripe-relay-selected" style="display:none;padding:8px 12px;border-radius:var(--rs);background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);font-size:.8rem;color:#4ade80;margin-bottom:8px"></div>
+    </div>
+    <!-- STEP 2: Card -->
+    <div style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,179,198,.5);margin-bottom:8px;font-weight:600">💳 Carte bancaire</div>
     <div id="stripe-card-element"></div>
     <div id="stripe-card-errors"></div>
     <button class="stripe-pay-btn" id="stripe-pay-btn" onclick="submitStripePayment()">
@@ -2268,19 +2288,30 @@ document.getElementById('profile-overlay').addEventListener('click', function(e)
 let activeCoupon = null;
 
 function getCouponDiscount(code, total) {
+  const upperCode = code.toUpperCase().trim();
   // Check wheel coupons from user
   const user = DB.getCurrent();
-  if (user && user.coupon && !user.coupon.used && user.coupon.code === code.toUpperCase()) {
+  if (user && user.coupon && !user.coupon.used && user.coupon.code === upperCode) {
     const c = user.coupon;
-    if (c.minAchat && total < c.minAchat) return { error: `Minimum d'achat : ${c.minAchat}€` };
-    const pct = parseInt(c.desc);
-    if (pct) return { pct, desc: c.desc, code: c.code };
+    if (c.minAchat && total < c.minAchat) return { error: "Minimum d'achat : " + c.minAchat + "€" };
+    // Extract % from desc e.g. "5% sans minimum" → 5
+    const pctMatch = c.desc.match(/(\d+)%/);
+    const pct = pctMatch ? parseInt(pctMatch[1]) : 0;
+    if (pct > 0) return { pct, desc: c.desc, code: c.code };
+  }
+  // Check WHEEL_SEGS codes (in case user doesn't have coupon saved but has the code)
+  const seg = WHEEL_SEGS.find(s => s.code === upperCode);
+  if (seg) {
+    if (seg.minAchat && total < seg.minAchat) return { error: "Minimum d'achat : " + seg.minAchat + "€" };
+    const pctMatch = seg.desc.match(/(\d+)%/);
+    const pct = pctMatch ? parseInt(pctMatch[1]) : 0;
+    if (pct > 0) return { pct, desc: seg.desc, code: seg.code };
   }
   // Check admin custom coupons
   const adminCoupons = JSON.parse(localStorage.getItem('eden_coupons') || '[]');
-  const found = adminCoupons.find(c => c.code === code.toUpperCase() && c.active);
+  const found = adminCoupons.find(c => c.code === upperCode && c.active);
   if (found) {
-    if (found.minAchat && total < found.minAchat) return { error: `Minimum d'achat : ${found.minAchat}€` };
+    if (found.minAchat && total < found.minAchat) return { error: "Minimum d'achat : " + found.minAchat + "€" };
     return { pct: found.pct, desc: found.pct + '% de réduction', code: found.code };
   }
   return null;
@@ -2524,4 +2555,45 @@ document.getElementById('stripe-overlay').addEventListener('click', function(e) 
 </script>
 
 </body>
-</html>
+</html><script>
+// ── Delivery selection in Stripe modal ─────────────────────────────
+let selectedDelivery = 'home';
+let stripeRelayPoint = null;
+
+function selectDelivery(type) {
+  selectedDelivery = type;
+  ['home','relay','locker'].forEach(t => {
+    document.getElementById('btn-delivery-'+t)?.classList.toggle('active', t === type);
+  });
+  const showSearch = type === 'relay' || type === 'locker';
+  document.getElementById('stripe-relay-search').style.display = showSearch ? 'block' : 'none';
+  if (!showSearch) {
+    stripeRelayPoint = null;
+    document.getElementById('stripe-relay-selected').style.display = 'none';
+  }
+}
+
+function searchRelayInStripe() {
+  const cp = document.getElementById('stripe-cp-input').value.trim();
+  if (!cp) return;
+  const tab = selectedDelivery === 'locker' ? 'locker' : 'relais';
+  const points = MR_POINTS_MOCK[tab];
+  const list = document.getElementById('stripe-relay-list');
+  list.innerHTML = '';
+  points.forEach(p => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid rgba(255,133,161,.15);border-radius:8px;cursor:pointer;background:rgba(255,255,255,.03);transition:all .2s';
+    div.innerHTML = `<span style="font-size:1.1rem">${p.icon}</span><div style="flex:1"><div style="font-size:.82rem;font-weight:700;color:#fff">${p.name}</div><div style="font-size:.72rem;color:rgba(255,179,198,.5)">${p.addr} — ${cp} · ${p.hours}</div></div>`;
+    div.onmouseover = () => div.style.background = 'rgba(255,133,161,.08)';
+    div.onmouseout = () => div.style.background = stripeRelayPoint?.id === p.id ? 'rgba(255,133,161,.08)' : 'rgba(255,255,255,.03)';
+    div.onclick = () => {
+      stripeRelayPoint = {...p, cp};
+      document.getElementById('stripe-relay-selected').style.display = 'block';
+      document.getElementById('stripe-relay-selected').textContent = '✅ ' + p.name + ' — ' + p.addr + ', ' + cp;
+      list.querySelectorAll('div').forEach(d => d.style.borderColor = 'rgba(255,133,161,.15)');
+      div.style.borderColor = 'var(--sakura-300)';
+    };
+    list.appendChild(div);
+  });
+}
+</script>
