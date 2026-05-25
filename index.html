@@ -209,6 +209,31 @@ main{position:relative;z-index:5;padding:0 16px 140px;max-width:1200px;margin:0 
 .auth-signup-btn::after{content:'';position:absolute;inset:-2px;border-radius:50px;background:linear-gradient(135deg,rgba(255,255,255,.4),transparent 40%,transparent 60%,rgba(255,133,161,.3));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude;padding:2px;opacity:.7}
 .auth-signup-btn:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 0 32px rgba(255,77,109,.8),0 6px 28px rgba(255,77,109,.6),0 0 60px rgba(255,133,161,.3),inset 0 1px 0 rgba(255,255,255,.3);animation:none}
 
+
+/* PROFILE MODAL */
+#profile-overlay{position:fixed;inset:0;background:rgba(10,5,20,.95);z-index:550;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:20px}
+#profile-overlay.open{opacity:1;pointer-events:all}
+.profile-modal{background:linear-gradient(135deg,#1a0d20,#120818);border:1px solid rgba(255,133,161,.3);border-radius:var(--r);width:min(94vw,500px);max-height:92vh;overflow-y:auto;padding:32px 28px;box-shadow:0 24px 80px rgba(180,40,100,.4);position:relative}
+.profile-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,133,161,.2);font-size:16px;color:rgba(255,179,198,.6);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.profile-close:hover{background:var(--sakura-300);color:#fff}
+.profile-avatar-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:24px}
+.profile-avatar-big{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--sakura-300),var(--sakura-400));display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:700;color:#fff;box-shadow:0 0 24px rgba(255,77,109,.5);margin-bottom:10px;border:2px solid rgba(255,133,161,.4)}
+.profile-fullname{font-family:'Noto Serif JP',serif;font-size:1.2rem;color:#fff;margin-bottom:3px}
+.profile-email-lbl{font-size:.8rem;color:rgba(255,179,198,.5)}
+.profile-section-title{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,179,198,.45);margin:20px 0 12px;font-weight:600}
+.profile-field{margin-bottom:14px}
+.profile-field label{display:block;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,179,198,.5);margin-bottom:5px;font-weight:600}
+.profile-input{width:100%;padding:11px 14px;border:1.5px solid rgba(255,133,161,.25);border-radius:var(--rs);background:rgba(255,255,255,.05);font-family:'Zen Kaku Gothic New',sans-serif;font-size:.9rem;color:#fff;outline:none;transition:border-color .2s}
+.profile-input:focus{border-color:var(--sakura-300);background:rgba(255,133,161,.08)}
+.profile-input::placeholder{color:rgba(255,179,198,.3)}
+.profile-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.profile-save-btn{width:100%;margin-top:20px;padding:13px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--sakura-300),var(--sakura-400));color:#fff;font-family:'Zen Kaku Gothic New',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 0 18px rgba(255,77,109,.45),0 4px 16px rgba(255,77,109,.35);transition:all .25s;letter-spacing:.06em}
+.profile-save-btn:hover{transform:translateY(-2px);box-shadow:0 0 28px rgba(255,77,109,.7)}
+.profile-logout-btn{width:100%;margin-top:10px;padding:11px;border:1px solid rgba(255,133,161,.2);border-radius:50px;background:transparent;color:rgba(255,179,198,.5);font-family:'Zen Kaku Gothic New',sans-serif;font-size:.85rem;cursor:pointer;transition:all .2s}
+.profile-logout-btn:hover{border-color:rgba(255,133,161,.5);color:#ffb3c6}
+.profile-success{display:none;text-align:center;padding:10px;margin-top:10px;border-radius:var(--rs);background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#4ade80;font-size:.85rem}
+.profile-divider{height:1px;background:rgba(255,133,161,.1);margin:6px 0 20px}
+
 /* CART */
 #cart-panel{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:100;width:min(96vw,500px);background:linear-gradient(135deg,#1a0d20,#0d0a1a);border:1px solid rgba(255,133,161,.3);border-radius:var(--r);box-shadow:0 16px 60px rgba(180,40,100,.4),0 0 0 1px rgba(255,133,161,.1);overflow:hidden;transition:all .4s cubic-bezier(.23,1,.32,1)}
 #cart-panel.hidden{transform:translateX(-50%) translateY(135%);opacity:0;pointer-events:none}
@@ -1590,7 +1615,7 @@ function updateAuthHeader() {
   if (!area) return;
   if (user) {
     const initials = (user.prenom[0] + user.nom[0]).toUpperCase();
-    area.innerHTML = `<div class="user-badge"><div class="user-avatar">${initials}</div><span class="user-name">${user.prenom}</span><button class="btn-logout" onclick="doLogout()" title="Déconnexion">✕</button></div>`;
+    area.innerHTML = `<div class="user-badge" onclick="openProfile()" style="cursor:pointer" title="Mon profil"><div class="user-avatar">${initials}</div><span class="user-name">${user.prenom}</span><button class="btn-logout" onclick="event.stopPropagation();doLogout()" title="Déconnexion">✕</button></div>`;
   } else {
     area.innerHTML = `<button class="auth-header-btn auth-login-btn" onclick="openAuth('login')">🔑 Connexion</button><button class="auth-header-btn auth-signup-btn" onclick="openAuth('signup')">✨ S'inscrire</button>`;
   }
@@ -1901,6 +1926,37 @@ updateCouponStrip();
 
 </script>
 
+<!-- PROFILE MODAL -->
+<div id="profile-overlay">
+  <div class="profile-modal">
+    <button class="profile-close" onclick="closeProfile()">✕</button>
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar-big" id="profile-avatar-big">EP</div>
+      <div class="profile-fullname" id="profile-fullname">Prénom Nom</div>
+      <div class="profile-email-lbl" id="profile-email-lbl">email@exemple.com</div>
+    </div>
+    <div class="profile-divider"></div>
+    <div class="profile-section-title">Informations personnelles</div>
+    <div class="profile-row">
+      <div class="profile-field"><label>Prénom *</label><input class="profile-input" id="pf-prenom" type="text" placeholder="Prénom"></div>
+      <div class="profile-field"><label>Nom *</label><input class="profile-input" id="pf-nom" type="text" placeholder="Nom"></div>
+    </div>
+    <div class="profile-field"><label>Email *</label><input class="profile-input" id="pf-email" type="email" placeholder="votre@email.com"></div>
+    <div class="profile-field"><label>Téléphone</label><input class="profile-input" id="pf-tel" type="tel" placeholder="+33 6 00 00 00 00"></div>
+    <div class="profile-section-title">Adresse de livraison</div>
+    <div class="profile-field"><label>Adresse</label><input class="profile-input" id="pf-adresse" type="text" placeholder="1 rue de la Paix"></div>
+    <div class="profile-row">
+      <div class="profile-field"><label>Code postal</label><input class="profile-input" id="pf-cp" type="text" placeholder="75001"></div>
+      <div class="profile-field"><label>Ville</label><input class="profile-input" id="pf-ville" type="text" placeholder="Paris"></div>
+    </div>
+    <div class="profile-section-title">Sécurité</div>
+    <div class="profile-field"><label>Nouveau mot de passe</label><input class="profile-input" id="pf-pwd" type="password" placeholder="Laisser vide pour ne pas changer"></div>
+    <div id="profile-success" class="profile-success">✅ Profil mis à jour avec succès !</div>
+    <button class="profile-save-btn" onclick="saveProfile()">💾 Sauvegarder les modifications</button>
+    <button class="profile-logout-btn" onclick="doLogout();closeProfile()">Se déconnecter</button>
+  </div>
+</div>
+
 <!-- STRIPE PAYMENT MODAL -->
 <div id="stripe-overlay">
   <div class="stripe-modal">
@@ -1999,6 +2055,61 @@ async function submitStripePayment() {
     btn.innerHTML = '🔒 Payer maintenant';
   }
 }
+
+
+// ── PROFILE ───────────────────────────────────────────
+function openProfile() {
+  const user = DB.getCurrent();
+  if (!user) { openAuth('login'); return; }
+  const initials = (user.prenom[0] + user.nom[0]).toUpperCase();
+  document.getElementById('profile-avatar-big').textContent = initials;
+  document.getElementById('profile-fullname').textContent = user.prenom + ' ' + user.nom;
+  document.getElementById('profile-email-lbl').textContent = user.email;
+  document.getElementById('pf-prenom').value = user.prenom || '';
+  document.getElementById('pf-nom').value = user.nom || '';
+  document.getElementById('pf-email').value = user.email || '';
+  document.getElementById('pf-tel').value = user.tel || '';
+  document.getElementById('pf-adresse').value = user.adresse || '';
+  document.getElementById('pf-cp').value = user.cp || '';
+  document.getElementById('pf-ville').value = user.ville || '';
+  document.getElementById('pf-pwd').value = '';
+  document.getElementById('profile-success').style.display = 'none';
+  document.getElementById('profile-overlay').classList.add('open');
+}
+function closeProfile() {
+  document.getElementById('profile-overlay').classList.remove('open');
+}
+function saveProfile() {
+  const user = DB.getCurrent();
+  if (!user) return;
+  const prenom = document.getElementById('pf-prenom').value.trim();
+  const nom = document.getElementById('pf-nom').value.trim();
+  const email = document.getElementById('pf-email').value.trim();
+  const tel = document.getElementById('pf-tel').value.trim();
+  const adresse = document.getElementById('pf-adresse').value.trim();
+  const cp = document.getElementById('pf-cp').value.trim();
+  const ville = document.getElementById('pf-ville').value.trim();
+  const pwd = document.getElementById('pf-pwd').value;
+  if (!prenom || !nom || !email) { showToast('Les champs * sont obligatoires'); return; }
+  const users = DB.getUsers();
+  const idx = users.findIndex(u => u.id === user.id);
+  if (idx === -1) return;
+  users[idx] = { ...users[idx], prenom, nom, email, tel, adresse, cp, ville };
+  if (pwd && pwd.length >= 8) users[idx].password = pwd;
+  else if (pwd && pwd.length > 0) { showToast('Mot de passe : 8 caractères minimum'); return; }
+  DB.saveUsers(users);
+  DB.setCurrent(users[idx]);
+  document.getElementById('profile-avatar-big').textContent = (prenom[0]+nom[0]).toUpperCase();
+  document.getElementById('profile-fullname').textContent = prenom + ' ' + nom;
+  document.getElementById('profile-email-lbl').textContent = email;
+  document.getElementById('profile-success').style.display = 'block';
+  updateAuthHeader();
+  showToast('Profil mis à jour ! 🌸');
+  setTimeout(() => { document.getElementById('profile-success').style.display = 'none'; }, 3000);
+}
+document.getElementById('profile-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeProfile();
+});
 
 document.getElementById('stripe-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeStripe();
