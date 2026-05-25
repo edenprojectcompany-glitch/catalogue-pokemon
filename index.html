@@ -463,11 +463,14 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
     </div>
   </div>
   <div class="topbar-actions">
-    <button class=\"lang-btn active\" id=\"lb-fr\" onclick=\"setLang('fr')\">FR</button>
-    <button class=\"lang-btn\" id=\"lb-en\" onclick=\"setLang('en')\">EN</button>
-    <button class=\"dark-btn\" id=\"dark-toggle\" onclick=\"toggleDark()\" title=\"Mode sombre\">☽</button>
-    <div id=\"auth-header-area\"></div>
-    <button class=\"admin-btn\" onclick=\"openAdmin()\" title=\"Admin\">⚙</button>
+    <button class="lang-btn active" id="lb-fr" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" id="lb-en" onclick="setLang('en')">EN</button>
+    <button class="dark-btn" id="dark-toggle" onclick="toggleDark()" title="Mode sombre">☽</button>
+    <div id="auth-header-area" style="display:flex;align-items:center;gap:8px">
+      <button class="auth-header-btn auth-login-btn" onclick="openAuth('login')">🔑 Connexion</button>
+      <button class="auth-header-btn auth-signup-btn" onclick="openAuth('signup')">✨ S'inscrire</button>
+    </div>
+    <button class="admin-btn" onclick="openAdmin()" title="Admin">⚙</button>
   </div>
 </header>
 
