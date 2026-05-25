@@ -7,7 +7,10 @@
 <meta name="keywords" content="pokemon tcg, displays japonais, displays chinois, grossiste pokemon, booster box, SV10, SV11, Mega Dream">
 <meta property="og:title" content="Eden Project TCG — Grossiste Pokémon TCG">
 <meta property="og:description" content="Displays japonais & chinois scellés. Livraison 24h. Tarifs dégressifs.">
+<link rel="canonical" href="https://edenprojecttcg.com/">
 <meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+<meta property="og:image" content="https://edenprojecttcg.com/og.jpg">
 <title>Eden Project TCG — Grossiste Pokémon TCG</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Zen+Kaku+Gothic+New:wght@300;400;700&display=swap" rel="stylesheet">
@@ -194,6 +197,13 @@ main{position:relative;z-index:5;padding:0 16px 140px;max-width:1200px;margin:0 
 .detail-btn{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid rgba(255,179,198,.3);color:var(--sakura-300);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:all .2s;font-weight:700}
 .detail-btn:hover{background:var(--sakura-300);color:#fff}
 [data-theme="dark"] .detail-btn{background:rgba(30,15,25,.9)}
+
+/* AUTH HEADER BUTTONS */
+.auth-header-btn{padding:7px 14px;border-radius:50px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.auth-login-btn{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2)}
+.auth-login-btn:hover{background:rgba(255,255,255,.22);color:#fff}
+.auth-signup-btn{background:linear-gradient(135deg,var(--sakura-300),var(--sakura-400));color:#fff;box-shadow:0 3px 12px rgba(255,77,109,.4);border:none}
+.auth-signup-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(255,77,109,.55)}
 
 /* CART */
 #cart-panel{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:100;width:min(96vw,500px);background:var(--ink);border-radius:var(--r);box-shadow:0 16px 60px rgba(10,5,30,.55);overflow:hidden;transition:all .4s cubic-bezier(.23,1,.32,1)}
@@ -424,6 +434,10 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
   .hero-stats{gap:16px}
   .topbar{padding:8px 14px}
   .brand-sub{display:none}
+  .tiers td,.tiers th{font-size:11px;padding:3px 0}
+  .detail-content{grid-template-columns:1fr}
+  .detail-img{border-radius:var(--r) var(--r) 0 0}
+  .detail-modal{width:98vw}
 }
 @media(max-width:420px){
   .trust-strip{grid-template-columns:1fr}
@@ -470,7 +484,7 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
   <h1 class="hero-title">Eden <b>Project</b></h1>
   <p class="hero-tagline" data-t="tagline">Votre grossiste Pokémon TCG de confiance</p>
   <div class="hero-stats">
-    <div class="hstat"><div class="hstat-num">22</div><div class="hstat-lbl">Produits</div></div>
+    <div class="hstat"><div class="hstat-num" id="stat-count">22</div><div class="hstat-lbl">Produits</div></div>
     <div class="hstat"><div class="hstat-num">24h</div><div class="hstat-lbl">Expédition</div></div>
     <div class="hstat"><div class="hstat-num">0€</div><div class="hstat-lbl">Min. commande</div></div>
     <div class="hstat"><div class="hstat-num">100%</div><div class="hstat-lbl">Officiel</div></div>
@@ -819,7 +833,9 @@ const STATIC_EBAY={
   M5:128,
 };
 
-const APW='eden2024', WANUM='33619180433', MAILTO='Edenprojectcompany@gmail.com';
+// ⚠️ SÉCURITÉ : Remplacez ce hash par sha256(votre_mot_de_passe) depuis https://emn178.github.io/online-tools/sha256.html
+const APW_HASH='5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // sha256('password') — À CHANGER
+const WANUM='33619180433', MAILTO='Edenprojectcompany@gmail.com';
 let ebay={...STATIC_EBAY};
 
 let CAT=[
@@ -848,7 +864,7 @@ let CAT=[
 ];
 
 // ── STOCK SYSTEM (managed via admin) ─────────────────────────────────────────
-let STOCK = {
+const STOCK_DEFAULT = {
   CN151vol3:{fr:20,asia:200},CN151vol4:{fr:15,asia:200},CN151vol1:{fr:10,asia:200},
   CN151vol2:{fr:8,asia:200}, GempackVol3:{fr:12,asia:200},GempackVol2:{fr:5,asia:200},
   GempackVol1:{fr:0,asia:200},GempackVol4:{fr:6,asia:200},GempackVol5:{fr:4,asia:200},
@@ -857,6 +873,8 @@ let STOCK = {
   SV10:{fr:10,asia:200},SV11b:{fr:8,asia:200},SV11w:{fr:8,asia:200},
   SV2a151:{fr:3,asia:200},M5:{fr:6,asia:200}
 };
+let STOCK = JSON.parse(localStorage.getItem('eden_stock')||'null') || {...STOCK_DEFAULT};
+function saveStock(){try{localStorage.setItem('eden_stock',JSON.stringify(STOCK));}catch(e){}}
 
 // ── I18N ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -1037,6 +1055,14 @@ function buildCard(p,q){
   const card=document.createElement('div');
   card.className='card';card.id='c-'+p.id;
 
+  // Card clickable to open detail
+  card.style.cursor='pointer';
+  card.addEventListener('click',function(e){
+    // Don't open detail if clicking on buttons, inputs, or the detail-btn itself
+    if(e.target.closest('.add-btn,.qbtn,.qi,.detail-btn'))return;
+    openDetail(p);
+  });
+
   // Image
   const imgWrap=makeImgWrap(p);
   // Badges overlay
@@ -1149,6 +1175,7 @@ function renderGrid(){
     const qty=cart[p.id]?cart[p.id].q:p.t[0].q;
     g.appendChild(buildCard(p,qty));
   });
+  const sc=document.getElementById('stat-count');if(sc)sc.textContent=CAT.length;
 }
 
 function refreshCard(id){
@@ -1237,13 +1264,6 @@ function orderTxt(){
   const items=Object.values(cart);
   return items.map(i=>'- '+i.p.ref+' : '+i.q+' bo\u00eete(s) \u00d7 '+i.pr+'\u20ac = '+(i.pr*i.q)+'\u20ac').join('\n')
     +'\n\nTOTAL : '+items.reduce((s,i)=>s+i.pr*i.q,0)+'\u20ac\nLivraison : Gratuite en France / 5,99\u20ac en Europe (gratuite \u00e0 partir d\'1 display)';
-}
-function sendWA(){
-  window.open('https://wa.me/'+WANUM+'?text='+encodeURIComponent('Bonjour Vincent (Eden Project TCG),\n\nVoici ma commande :\n\n'+orderTxt()+'\n\nMerci !'),'_blank');
-}
-function sendEmail(){
-  location.href='mailto:'+MAILTO+'?subject='+encodeURIComponent('Commande Eden Project TCG')
-    +'&body='+encodeURIComponent('Bonjour Vincent,\n\nVoici ma commande :\n\n'+orderTxt()+'\n\nCordialement');
 }
 
 // ── DETAIL MODAL ──────────────────────────────────────────────────────────────
@@ -1337,8 +1357,11 @@ function openAdmin(){
   document.getElementById('admin-err').style.display='none';
 }
 function closeAdmin(){document.getElementById('admin-overlay').classList.remove('open');}
-function checkPw(){
-  if(document.getElementById('admin-pw-input').value===APW){
+async function checkPw(){
+  const inp=document.getElementById('admin-pw-input').value;
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(inp));
+  const hash=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if(hash===APW_HASH){
     document.getElementById('admin-lock').style.display='none';
     document.getElementById('admin-content').style.display='block';
     buildAdminFields();
@@ -1373,7 +1396,7 @@ function saveAdmin(){
     STOCK[p.id].fr=parseInt(sf)||0;
     STOCK[p.id].asia=parseInt(sa)||0;
   });
-  renderGrid();closeAdmin();showToast(t('savedAdmin'));
+  renderGrid();saveStock();closeAdmin();showToast(t('savedAdmin'));
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────────────────
@@ -1497,6 +1520,13 @@ function doSignup() {
   users.push(newUser);
   DB.saveUsers(users);
   DB.setCurrent(newUser);
+  // Send to Vercel API (non-blocking)
+  const apiPayload = {prenom, nom, email, tel, adresse, cp, ville, createdAt: newUser.createdAt};
+  fetch('/api/register', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(apiPayload)
+  }).catch(()=>{}); // Silent fail if not on Vercel
   document.getElementById('auth-form-signup').style.display = 'none';
   document.getElementById('auth-form-login').style.display = 'none';
   document.getElementById('auth-form-success').style.display = '';
@@ -1524,7 +1554,7 @@ function updateAuthHeader() {
     const initials = (user.prenom[0] + user.nom[0]).toUpperCase();
     area.innerHTML = `<div class="user-badge"><div class="user-avatar">${initials}</div><span class="user-name">${user.prenom}</span><button class="btn-logout" onclick="doLogout()" title="Déconnexion">✕</button></div>`;
   } else {
-    area.innerHTML = `<button class="lang-btn" onclick="openAuth('login')" style="margin-right:0">Connexion</button><button class="lang-btn" onclick="openAuth('signup')" style="background:var(--sakura-300);color:#fff;border-color:var(--sakura-300)">S'inscrire</button>`;
+    area.innerHTML = `<button class="auth-header-btn auth-login-btn" onclick="openAuth('login')">Connexion</button><button class="auth-header-btn auth-signup-btn" onclick="openAuth('signup')">✨ S'inscrire</button>`;
   }
 }
 
@@ -1792,26 +1822,17 @@ function updateCouponStrip() {
 }
 
 // ── OVERRIDE sendWA to include coupon ────────────────────────────────────────
-const _originalOrderTxt = orderTxt;
-function orderTxtWithCoupon() {
-  const user = DB.getCurrent();
-  let txt = _originalOrderTxt();
-  if (user && user.coupon && !user.coupon.used) {
-    txt += '\n\n🎟️ Code promo : ' + user.coupon.code + ' (' + user.coupon.desc + ')';
-  }
+function orderTxtFinal(){
+  const user=DB.getCurrent();
+  let txt=orderTxt();
+  if(user&&user.coupon&&!user.coupon.used)txt+='\n\n🎟️ Code promo : '+user.coupon.code+' ('+user.coupon.desc+')';
   return txt;
 }
-// Monkey-patch sendWA
-const _origSendWA = sendWA;
-function sendWA() {
-  const items = Object.values(cart);
-  const txt = orderTxtWithCoupon();
-  window.open('https://wa.me/' + WANUM + '?text=' + encodeURIComponent('Bonjour Vincent (Eden Project TCG),\n\nVoici ma commande :\n\n' + txt + '\n\nMerci !'), '_blank');
+function sendWA(){
+  window.open('https://wa.me/'+WANUM+'?text='+encodeURIComponent('Bonjour Vincent (Eden Project TCG),\n\nVoici ma commande :\n\n'+orderTxtFinal()+'\n\nMerci !'),'_blank');
 }
-const _origSendEmail = sendEmail;
-function sendEmail() {
-  const txt = orderTxtWithCoupon();
-  location.href = 'mailto:' + MAILTO + '?subject=' + encodeURIComponent('Commande Eden Project TCG') + '&body=' + encodeURIComponent('Bonjour Vincent,\n\nVoici ma commande :\n\n' + txt + '\n\nCordialement');
+function sendEmail(){
+  location.href='mailto:'+MAILTO+'?subject='+encodeURIComponent('Commande Eden Project TCG')+'&body='+encodeURIComponent('Bonjour Vincent,\n\nVoici ma commande :\n\n'+orderTxtFinal()+'\n\nCordialement');
 }
 
 // ── INIT AUTH ────────────────────────────────────────────────────────────────
