@@ -1,5 +1,6 @@
-// api/user.js — Eden Project TCG — mise à jour profil
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,11 +14,11 @@ export default async function handler(req, res) {
     if (!email) return res.status(400).json({ error: 'Email requis' });
 
     const key = `user:${email.toLowerCase().trim()}`;
-    const user = await kv.get(key);
+    const user = await redis.get(key);
     if (!user) return res.status(404).json({ error: 'Compte introuvable' });
 
     const updated = { ...user, ...updates };
-    await kv.set(key, updated);
+    await redis.set(key, updated);
 
     const { password: _, ...safeUser } = updated;
     return res.status(200).json({ success: true, user: safeUser });

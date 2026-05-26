@@ -1,5 +1,6 @@
-// api/login.js — Eden Project TCG
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,9 +13,7 @@ export default async function handler(req, res) {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email et mot de passe requis' });
 
-    const key = `user:${email.toLowerCase().trim()}`;
-    const user = await kv.get(key);
-
+    const user = await redis.get(`user:${email.toLowerCase().trim()}`);
     if (!user) return res.status(404).json({ error: 'Aucun compte avec cet email.' });
     if (user.password !== password) return res.status(401).json({ error: 'Mot de passe incorrect.' });
 
