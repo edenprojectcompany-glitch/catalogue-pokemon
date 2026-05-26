@@ -2492,8 +2492,14 @@ function searchRelayInStripe() {
 function toggleStripeCart(){
   const tog=document.getElementById('stripe-cart-toggle');
   const lst=document.getElementById('stripe-cart-items');
-  const open=lst.classList.toggle('open');
-  tog.classList.toggle('open',open);
+  const isOpen=lst.classList.contains('open');
+  if(isOpen){
+    lst.classList.remove('open');
+    tog.classList.remove('open');
+  } else {
+    lst.classList.add('open');
+    tog.classList.add('open');
+  }
 }
 function buildStripeCartSummary(){
   const c=document.getElementById('stripe-cart-items');
@@ -2638,8 +2644,12 @@ function flyToCart(src){
     </div>
     <div class="stripe-cart-summary">
       <button class="stripe-cart-toggle" id="stripe-cart-toggle" onclick="toggleStripeCart()">
-        <span>Voir le detail de ma commande</span>
-        <span class="stripe-cart-toggle-arrow">&#9660;</span>
+        <span class="stripe-cart-toggle-left">
+          <span>&#x1F6D2;</span>
+          <span id="stripe-cart-toggle-label">Ma commande</span>
+          <span class="stripe-cart-toggle-count" id="stripe-cart-count-badge">0</span>
+        </span>
+        <span class="stripe-cart-toggle-icon">&#9660;</span>
       </button>
       <div class="stripe-cart-items" id="stripe-cart-items"></div>
     </div>
