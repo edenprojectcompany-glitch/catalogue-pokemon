@@ -2037,117 +2037,6 @@ updateCouponStrip();
   }
 })();
 
-</script>
-
-<!-- PROFILE MODAL -->
-<div id="profile-overlay">
-  <div class="profile-modal">
-    <button class="profile-close" onclick="closeProfile()">✕</button>
-    <div class="profile-avatar-wrap">
-      <div class="profile-avatar-big" id="profile-avatar-big">EP</div>
-      <div class="profile-fullname" id="profile-fullname">Prénom Nom</div>
-      <div class="profile-email-lbl" id="profile-email-lbl">email@exemple.com</div>
-    </div>
-    <div class="profile-divider"></div>
-    <div class="profile-section-title">Informations personnelles</div>
-    <div class="profile-row">
-      <div class="profile-field"><label>Prénom *</label><input class="profile-input" id="pf-prenom" type="text" placeholder="Prénom"></div>
-      <div class="profile-field"><label>Nom *</label><input class="profile-input" id="pf-nom" type="text" placeholder="Nom"></div>
-    </div>
-    <div class="profile-field"><label>Email *</label><input class="profile-input" id="pf-email" type="email" placeholder="votre@email.com"></div>
-    <div class="profile-field"><label>Téléphone</label><input class="profile-input" id="pf-tel" type="tel" placeholder="+33 6 00 00 00 00"></div>
-    <div class="profile-section-title">Adresse de livraison</div>
-    <div class="profile-field"><label>Adresse</label><input class="profile-input" id="pf-adresse" type="text" placeholder="1 rue de la Paix"></div>
-    <div class="profile-row">
-      <div class="profile-field"><label>Code postal</label><input class="profile-input" id="pf-cp" type="text" placeholder="75001"></div>
-      <div class="profile-field"><label>Ville</label><input class="profile-input" id="pf-ville" type="text" placeholder="Paris"></div>
-    </div>
-    <div class="profile-section-title">Sécurité</div>
-    <div class="profile-field"><label>Nouveau mot de passe</label><input class="profile-input" id="pf-pwd" type="password" placeholder="Laisser vide pour ne pas changer"></div>
-    <div id="profile-success" class="profile-success">✅ Profil mis à jour avec succès !</div>
-    <button class="profile-save-btn" onclick="saveProfile()">💾 Sauvegarder les modifications</button>
-    <button class="profile-logout-btn" onclick="doLogout();closeProfile()">Se déconnecter</button>
-  </div>
-</div>
-
-
-<!-- WHEEL POPUP after login -->
-<div id="wheel-popup-overlay">
-  <div class="wheel-popup">
-    <span class="wheel-popup-icon">🎡</span>
-    <h2>Votre tentative vous attend !</h2>
-    <p>Bienvenue ! Vous avez une tentative disponible sur la <strong style="color:var(--sakura-300)">Roue de la Fortune Eden</strong>.<br>Tentez de gagner jusqu'à une display offerte !</p>
-    <button class="wheel-popup-btn" onclick="closeWheelPopup();openWheel()">🎰 Tourner maintenant !</button>
-    <button class="wheel-popup-skip" onclick="closeWheelPopup()">Plus tard →</button>
-  </div>
-</div>
-
-<!-- MONDIAL RELAY MODAL -->
-<div id="mr-overlay">
-  <div class="mr-modal">
-    <button class="mr-close" onclick="closeMondialRelay()">✕</button>
-    <div class="mr-title">📦 Choisir un point de retrait</div>
-    <div class="mr-sub">Mondial Relay — Livraison 2-5 jours · à partir de 3,99€</div>
-    <div class="mr-search-row">
-      <input class="mr-search-input" id="mr-search-input" type="text" placeholder="Code postal ou ville..." onkeydown="if(event.key==='Enter')searchMondialRelay()">
-      <button class="mr-search-btn" onclick="searchMondialRelay()">Rechercher</button>
-    </div>
-    <div class="mr-tabs">
-      <button class="mr-tab active" id="mr-tab-relais" onclick="switchMRTab('relais')">🏪 Points Relais</button>
-      <button class="mr-tab" id="mr-tab-locker" onclick="switchMRTab('locker')">🔒 Lockers 24/7</button>
-    </div>
-    <div class="mr-map-wrap" id="mr-map-wrap">
-      <div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,179,198,.4);font-size:.85rem">
-        🔍 Recherchez un code postal pour voir la carte
-      </div>
-    </div>
-    <div class="mr-list" id="mr-list">
-      <div style="text-align:center;padding:20px;color:rgba(255,179,198,.4);font-size:.85rem">Entrez un code postal pour trouver les points proches</div>
-    </div>
-    <div class="mr-selected-display" id="mr-selected-display"></div>
-    <button class="mr-confirm-btn" id="mr-confirm-btn" onclick="confirmMondialRelay()" disabled>Choisir ce point de retrait</button>
-  </div>
-</div>
-
-<!-- STRIPE PAYMENT MODAL -->
-<div id="stripe-overlay">
-  <div class="stripe-modal">
-    <button class="stripe-close" onclick="closeStripe()">✕</button>
-    <h2>💳 Paiement sécurisé</h2>
-    <p class="stripe-modal-sub">Paiement par carte bancaire via Stripe</p>
-    <div class="stripe-amount-display">
-      <span class="stripe-amount-label">Total commande</span>
-      <span class="stripe-amount-value" id="stripe-amount-display">0 €</span>
-    </div>
-    <!-- STEP 1: Relay choice -->
-    <div id="stripe-step-relay" style="margin-bottom:14px">
-      <div style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,179,198,.5);margin-bottom:8px;font-weight:600">📦 Livraison</div>
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <button class="stripe-delivery-btn active" id="btn-delivery-home" onclick="selectDelivery('home')">🏠 Domicile</button>
-        <button class="stripe-delivery-btn" id="btn-delivery-relay" onclick="selectDelivery('relay')">📦 Point Relais</button>
-        <button class="stripe-delivery-btn" id="btn-delivery-locker" onclick="selectDelivery('locker')">🔒 Locker 24/7</button>
-      </div>
-      <div id="stripe-relay-search" style="display:none;margin-bottom:10px">
-        <div style="display:flex;gap:6px;margin-bottom:8px">
-          <input class="profile-input" id="stripe-cp-input" type="text" placeholder="Code postal..." style="flex:1;padding:9px 12px;font-size:13px" onkeydown="if(event.key==='Enter')searchRelayInStripe()">
-          <button onclick="searchRelayInStripe()" style="padding:9px 14px;border:none;border-radius:50px;background:var(--sakura-300);color:#fff;font-weight:700;font-size:12px;cursor:pointer">Chercher</button>
-        </div>
-        <div id="stripe-relay-list" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
-      </div>
-      <div id="stripe-relay-selected" style="display:none;padding:8px 12px;border-radius:var(--rs);background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);font-size:.8rem;color:#4ade80;margin-bottom:8px"></div>
-    </div>
-    <!-- STEP 2: Card -->
-    <div style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,179,198,.5);margin-bottom:8px;font-weight:600">💳 Carte bancaire</div>
-    <div id="stripe-card-element"></div>
-    <div id="stripe-card-errors"></div>
-    <button class="stripe-pay-btn" id="stripe-pay-btn" onclick="submitStripePayment()">
-      🔒 Payer maintenant
-    </button>
-    <div class="stripe-secure">🔒 Paiement sécurisé SSL · Powered by Stripe</div>
-  </div>
-</div>
-
-<script>
 // ══════════════════════════════════════════════════════
 // STRIPE PAYMENT
 // ══════════════════════════════════════════════════════
@@ -2552,10 +2441,7 @@ function saveWheelAdmin() {
 document.getElementById('stripe-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeStripe();
 });
-</script>
 
-</body>
-</html><script>
 // ── Delivery selection in Stripe modal ─────────────────────────────
 let selectedDelivery = 'home';
 let stripeRelayPoint = null;
@@ -2595,5 +2481,117 @@ function searchRelayInStripe() {
     };
     list.appendChild(div);
   });
-}
-</script>
+}</script>
+
+<!-- PROFILE MODAL -->
+<div id="profile-overlay">
+  <div class="profile-modal">
+    <button class="profile-close" onclick="closeProfile()">✕</button>
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar-big" id="profile-avatar-big">EP</div>
+      <div class="profile-fullname" id="profile-fullname">Prénom Nom</div>
+      <div class="profile-email-lbl" id="profile-email-lbl">email@exemple.com</div>
+    </div>
+    <div class="profile-divider"></div>
+    <div class="profile-section-title">Informations personnelles</div>
+    <div class="profile-row">
+      <div class="profile-field"><label>Prénom *</label><input class="profile-input" id="pf-prenom" type="text" placeholder="Prénom"></div>
+      <div class="profile-field"><label>Nom *</label><input class="profile-input" id="pf-nom" type="text" placeholder="Nom"></div>
+    </div>
+    <div class="profile-field"><label>Email *</label><input class="profile-input" id="pf-email" type="email" placeholder="votre@email.com"></div>
+    <div class="profile-field"><label>Téléphone</label><input class="profile-input" id="pf-tel" type="tel" placeholder="+33 6 00 00 00 00"></div>
+    <div class="profile-section-title">Adresse de livraison</div>
+    <div class="profile-field"><label>Adresse</label><input class="profile-input" id="pf-adresse" type="text" placeholder="1 rue de la Paix"></div>
+    <div class="profile-row">
+      <div class="profile-field"><label>Code postal</label><input class="profile-input" id="pf-cp" type="text" placeholder="75001"></div>
+      <div class="profile-field"><label>Ville</label><input class="profile-input" id="pf-ville" type="text" placeholder="Paris"></div>
+    </div>
+    <div class="profile-section-title">Sécurité</div>
+    <div class="profile-field"><label>Nouveau mot de passe</label><input class="profile-input" id="pf-pwd" type="password" placeholder="Laisser vide pour ne pas changer"></div>
+    <div id="profile-success" class="profile-success">✅ Profil mis à jour avec succès !</div>
+    <button class="profile-save-btn" onclick="saveProfile()">💾 Sauvegarder les modifications</button>
+    <button class="profile-logout-btn" onclick="doLogout();closeProfile()">Se déconnecter</button>
+  </div>
+</div>
+
+
+<!-- WHEEL POPUP after login -->
+<div id="wheel-popup-overlay">
+  <div class="wheel-popup">
+    <span class="wheel-popup-icon">🎡</span>
+    <h2>Votre tentative vous attend !</h2>
+    <p>Bienvenue ! Vous avez une tentative disponible sur la <strong style="color:var(--sakura-300)">Roue de la Fortune Eden</strong>.<br>Tentez de gagner jusqu'à une display offerte !</p>
+    <button class="wheel-popup-btn" onclick="closeWheelPopup();openWheel()">🎰 Tourner maintenant !</button>
+    <button class="wheel-popup-skip" onclick="closeWheelPopup()">Plus tard →</button>
+  </div>
+</div>
+
+<!-- MONDIAL RELAY MODAL -->
+<div id="mr-overlay">
+  <div class="mr-modal">
+    <button class="mr-close" onclick="closeMondialRelay()">✕</button>
+    <div class="mr-title">📦 Choisir un point de retrait</div>
+    <div class="mr-sub">Mondial Relay — Livraison 2-5 jours · à partir de 3,99€</div>
+    <div class="mr-search-row">
+      <input class="mr-search-input" id="mr-search-input" type="text" placeholder="Code postal ou ville..." onkeydown="if(event.key==='Enter')searchMondialRelay()">
+      <button class="mr-search-btn" onclick="searchMondialRelay()">Rechercher</button>
+    </div>
+    <div class="mr-tabs">
+      <button class="mr-tab active" id="mr-tab-relais" onclick="switchMRTab('relais')">🏪 Points Relais</button>
+      <button class="mr-tab" id="mr-tab-locker" onclick="switchMRTab('locker')">🔒 Lockers 24/7</button>
+    </div>
+    <div class="mr-map-wrap" id="mr-map-wrap">
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,179,198,.4);font-size:.85rem">
+        🔍 Recherchez un code postal pour voir la carte
+      </div>
+    </div>
+    <div class="mr-list" id="mr-list">
+      <div style="text-align:center;padding:20px;color:rgba(255,179,198,.4);font-size:.85rem">Entrez un code postal pour trouver les points proches</div>
+    </div>
+    <div class="mr-selected-display" id="mr-selected-display"></div>
+    <button class="mr-confirm-btn" id="mr-confirm-btn" onclick="confirmMondialRelay()" disabled>Choisir ce point de retrait</button>
+  </div>
+</div>
+
+<!-- STRIPE PAYMENT MODAL -->
+<div id="stripe-overlay">
+  <div class="stripe-modal">
+    <button class="stripe-close" onclick="closeStripe()">✕</button>
+    <h2>💳 Paiement sécurisé</h2>
+    <p class="stripe-modal-sub">Paiement par carte bancaire via Stripe</p>
+    <div class="stripe-amount-display">
+      <span class="stripe-amount-label">Total commande</span>
+      <span class="stripe-amount-value" id="stripe-amount-display">0 €</span>
+    </div>
+    <!-- STEP 1: Relay choice -->
+    <div id="stripe-step-relay" style="margin-bottom:14px">
+      <div style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,179,198,.5);margin-bottom:8px;font-weight:600">📦 Livraison</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="stripe-delivery-btn active" id="btn-delivery-home" onclick="selectDelivery('home')">🏠 Domicile</button>
+        <button class="stripe-delivery-btn" id="btn-delivery-relay" onclick="selectDelivery('relay')">📦 Point Relais</button>
+        <button class="stripe-delivery-btn" id="btn-delivery-locker" onclick="selectDelivery('locker')">🔒 Locker 24/7</button>
+      </div>
+      <div id="stripe-relay-search" style="display:none;margin-bottom:10px">
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input class="profile-input" id="stripe-cp-input" type="text" placeholder="Code postal..." style="flex:1;padding:9px 12px;font-size:13px" onkeydown="if(event.key==='Enter')searchRelayInStripe()">
+          <button onclick="searchRelayInStripe()" style="padding:9px 14px;border:none;border-radius:50px;background:var(--sakura-300);color:#fff;font-weight:700;font-size:12px;cursor:pointer">Chercher</button>
+        </div>
+        <div id="stripe-relay-list" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+      <div id="stripe-relay-selected" style="display:none;padding:8px 12px;border-radius:var(--rs);background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);font-size:.8rem;color:#4ade80;margin-bottom:8px"></div>
+    </div>
+    <!-- STEP 2: Card -->
+    <div style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,179,198,.5);margin-bottom:8px;font-weight:600">💳 Carte bancaire</div>
+    <div id="stripe-card-element"></div>
+    <div id="stripe-card-errors"></div>
+    <button class="stripe-pay-btn" id="stripe-pay-btn" onclick="submitStripePayment()">
+      🔒 Payer maintenant
+    </button>
+    <div class="stripe-secure">🔒 Paiement sécurisé SSL · Powered by Stripe</div>
+  </div>
+</div>
+
+
+
+</body>
+</html>
