@@ -2238,7 +2238,7 @@ function initStripe() {
   if (stripeInstance) return;
   if (typeof Stripe === 'undefined') { console.error('Stripe.js non chargé'); return; }
   stripeInstance = Stripe(STRIPE_PK);
-  const elements = stripeInstance.elements();
+  const elements = stripeInstance.elements({ disableLink: true });
   stripeCardElement = elements.create('card', {
     style: {
       base: { fontFamily: 'Zen Kaku Gothic New, sans-serif', fontSize: '15px', color: '#ffffff', '::placeholder': { color: 'rgba(255,179,198,0.45)' } },
