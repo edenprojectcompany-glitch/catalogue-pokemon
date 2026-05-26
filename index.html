@@ -634,20 +634,23 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
 
 /* ── PANIER : barre mini quand fermé ── */
 #cart-panel{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  z-index:9999;width:min(96vw,500px);
+  position:fixed;
+  bottom:0;
+  left:0;right:0;
+  margin:0 auto;
+  width:min(96vw,500px);
+  z-index:9999;
   background:linear-gradient(135deg,#1a0d20,#0d0a1a);
   border:1px solid rgba(255,133,161,.3);
   border-radius:var(--r) var(--r) 0 0;
   box-shadow:0 -4px 30px rgba(180,40,100,.3),0 0 0 1px rgba(255,133,161,.1);
   overflow:hidden;
-  transition:transform .4s cubic-bezier(.23,1,.32,1),opacity .4s;
-  will-change:transform;
-  isolation:isolate;
+  transition:opacity .3s,visibility .3s;
+  transform:none !important;
 }
 #cart-panel.hidden{
-  transform:translateX(-50%) translateY(110%);
   opacity:0;
+  visibility:hidden;
   pointer-events:none;
 }
 /* cart-panel.hidden migré */
