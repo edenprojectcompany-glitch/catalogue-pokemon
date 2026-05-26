@@ -2,7 +2,7 @@
 <html lang="fr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=1200">
 <meta name="description" content="Eden Project TCG - Grossiste Pokémon TCG. Displays japonais et chinois scellés. Livraison 24h depuis la France. Tarifs dégressifs.">
 <meta name="keywords" content="pokemon tcg, displays japonais, displays chinois, grossiste pokemon, booster box, SV10, SV11, Mega Dream">
 <meta property="og:title" content="Eden Project TCG — Grossiste Pokémon TCG">
@@ -376,7 +376,7 @@ main{position:relative;z-index:5;padding:0 16px 140px;max-width:1200px;margin:0 
 [data-theme="dark"] .dstat{background:rgba(180,80,120,.1)}
 .dstat-label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-m);margin-bottom:3px}
 .dstat-value{font-size:14px;font-weight:600;color:var(--ink)}
-/* detail responsive → géré dans le bloc @media(max-width:600px) */
+
 
 /* ABOUT / CONTACT SECTION */
 .about-section{position:relative;z-index:5;max-width:960px;margin:0 auto 40px;padding:0 16px}
@@ -394,7 +394,7 @@ main{position:relative;z-index:5;padding:0 16px 140px;max-width:1200px;margin:0 
 .contact-wa:hover{background:#1ebe5d;transform:translateX(4px)}
 .contact-mail{background:var(--blue-l);color:var(--blue)}
 .contact-mail:hover{background:#bbdefb;transform:translateX(4px)}
-/* about-grid responsive → géré dans le bloc @media(max-width:600px) */
+
 
 /* ADMIN */
 #admin-overlay{position:fixed;inset:0;background:rgba(20,10,30,.85);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:20px}
@@ -542,172 +542,7 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
 #toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--ink);color:#fff;border-radius:50px;padding:10px 24px;font-size:13px;font-weight:600;z-index:400;transition:transform .38s cubic-bezier(.23,1,.32,1);white-space:nowrap;pointer-events:none;border:1px solid rgba(255,179,198,.3)}
 #toast.show{transform:translateX(-50%) translateY(0)}
 
-/* RESPONSIVE */
-@media(max-width:700px){
-  .trust-strip{grid-template-columns:1fr 1fr}
-  .grid{grid-template-columns:1fr}
-  .hero-stats{gap:16px}
-  .topbar{padding:8px 14px}
-  .brand-sub{display:none}
-  .tiers td,.tiers th{font-size:11px;padding:3px 0}
-  .detail-content{grid-template-columns:1fr}
-  .detail-img{border-radius:var(--r) var(--r) 0 0}
-  .detail-modal{width:98vw}
-}
-@media(max-width:420px){
-  .trust-strip{grid-template-columns:1fr}
-  .cart-actions{flex-direction:column}
-}
-
-/* ====================================
-   MOBILE OPTIMISATIONS (≤ 600px)
-   Ne modifie pas le rendu desktop
-   ==================================== */
-@media(max-width:600px){
-
-  /* --- TOPBAR --- */
-  .topbar{padding:8px 12px;gap:6px}
-  .topbar-brand{flex:1;min-width:0}
-  .brand-logo{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .topbar-actions{gap:5px;flex-shrink:0}
-  .lang-btn{padding:3px 8px;font-size:11px}
-  .dark-btn,.admin-btn{width:30px;height:30px;font-size:14px}
-  .auth-header-btn{padding:7px 12px;font-size:12px}
-  .user-badge{padding:4px 8px;gap:5px}
-  .user-name{font-size:.75rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-  /* --- SHIP BANNER --- */
-  .ship-banner{font-size:11px;padding:7px 10px;line-height:1.5}
-  .ship-banner span{display:block;margin:0;text-align:center}
-
-  /* --- HERO --- */
-  .hero{padding:36px 14px 30px}
-  .hero-title{font-size:clamp(26px,7vw,40px);letter-spacing:.06em}
-  .hero-tagline{font-size:13px;letter-spacing:.03em;margin-bottom:22px}
-  .hero-stats{gap:12px}
-  .hstat-num{font-size:22px}
-  .hstat-lbl{font-size:10px}
-  .hero-cta{padding:12px 24px;font-size:14px}
-
-  /* --- TRUST STRIP --- */
-  .trust-strip{grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 20px}
-  .trust-card{padding:11px 10px}
-  .trust-icon{font-size:18px}
-  .trust-title{font-size:12px}
-  .trust-desc{font-size:10px}
-
-  /* --- FILTERS --- */
-  .filters{padding:0 12px 14px}
-  .filters-inner{gap:7px}
-  .search-wrap{min-width:0;max-width:100%;flex:1 1 100%}
-  .filter-btn{padding:7px 13px;font-size:12px}
-
-  /* --- GRID / CARDS --- */
-  main{padding:0 10px 160px}
-  .grid{grid-template-columns:1fr;gap:14px}
-  .card-body{padding:13px 13px 15px}
-  .tiers{margin-bottom:9px}
-  .tiers td,.tiers th{font-size:11px;padding:3px 0}
-  .ebay-row{padding:7px 10px}
-  .eb-price{font-size:13px}
-  .add-btn{padding:11px;font-size:12px}
-  .qty-ctrl{border-radius:50px}
-  .qbtn{width:30px;height:30px}
-  .qi{width:38px;height:30px;font-size:13px}
-
-  /* --- WHEEL BANNER --- */
-  .wheel-banner{padding:0 12px;margin-bottom:16px}
-  .wheel-banner-body{grid-template-columns:1fr;gap:14px;padding:18px 16px}
-  .wheel-banner-left{flex-direction:column;align-items:flex-start;gap:12px}
-  .wheel-icon-wrap-v2{width:52px;height:52px}
-  .wheel-icon-core{width:38px;height:38px;font-size:18px}
-  .wheel-title-v2{font-size:1rem}
-  .wheel-subtitle-v2{font-size:.78rem;margin-bottom:6px}
-  .wheel-cta-col{min-width:0;width:100%}
-  .wheel-footer-strip{padding:8px 14px;gap:12px}
-  .wfs-item{font-size:.65rem}
-
-  /* --- COUPON STRIP --- */
-  .coupon-strip{padding:0 12px}
-  .coupon-strip-inner{flex-wrap:wrap;gap:8px;padding:10px 14px}
-  .coupon-code-display{font-size:.9rem}
-
-  /* --- CART PANEL --- */
-  #cart-panel{width:calc(100% - 20px);bottom:10px;border-radius:14px}
-  .cart-list{max-height:180px}
-  .cart-body.open{max-height:460px}
-  .cart-total-val{font-size:20px}
-  .cart-actions{padding:0 14px 14px;flex-wrap:wrap}
-  .act-btn{font-size:11px;padding:10px 6px}
-
-  /* --- CART COUPON --- */
-  .cart-coupon-row{flex-wrap:wrap;gap:6px;padding:0 14px 8px}
-  .cart-coupon-input{min-width:0;flex:1}
-
-  /* --- DETAIL MODAL --- */
-  #detail-overlay{padding:10px}
-  .detail-modal{width:100%;border-radius:var(--rs)}
-  .detail-content{grid-template-columns:1fr}
-  .detail-img{border-radius:var(--rs) var(--rs) 0 0;padding:16px}
-  .detail-img img{max-height:200px}
-  .detail-info{padding:18px 16px}
-  .detail-ref{font-size:18px}
-  .detail-desc{font-size:12px}
-  .detail-stats{grid-template-columns:1fr 1fr;gap:8px}
-
-  /* --- AUTH MODAL --- */
-  #auth-overlay{padding:12px}
-  .auth-modal{padding:22px 16px;width:100%}
-  .auth-form-row{grid-template-columns:1fr}
-
-  /* --- PROFILE MODAL --- */
-  #profile-overlay{padding:12px}
-  .profile-modal{padding:24px 16px;width:100%}
-  .profile-row{grid-template-columns:1fr}
-
-  /* --- ADMIN --- */
-  #admin-overlay{padding:10px}
-  .admin-modal{padding:20px 14px;width:100%}
-  .admin-grid{grid-template-columns:1fr 1fr}
-  .admin-stock-table th,.admin-stock-table td{padding:6px 6px;font-size:11px}
-  .admin-stock-input{width:56px;font-size:12px}
-  .admin-tabs{gap:4px}
-  .admin-tab-btn{padding:6px 11px;font-size:11px}
-  .admin-lock-row{flex-direction:column;gap:8px}
-  .admin-lock-row input,.admin-lock-row button{width:100%}
-
-  /* --- MONDIAL RELAY --- */
-  #mr-overlay{padding:10px}
-  .mr-modal{padding:18px 14px;width:100%}
-  .mr-search-row{flex-direction:column;gap:6px}
-  .mr-search-btn{width:100%}
-  .mr-map-wrap{height:200px}
-
-  /* --- WHEEL MODAL --- */
-  #wheel-overlay{padding:12px}
-  .wheel-modal{padding:20px 16px}
-  .wheel-wrapper{width:260px;height:260px}
-  .wheel-canvas{width:260px!important;height:260px!important}
-
-  /* --- WHEEL POPUP --- */
-  #wheel-popup-overlay{padding:12px}
-  .wheel-popup{padding:24px 18px}
-  .wheel-popup h2{font-size:1.2rem}
-
-  /* --- ABOUT SECTION --- */
-  .about-section{padding:0 12px}
-  .about-card{padding:22px 16px}
-  .about-grid{grid-template-columns:1fr;gap:24px}
-  .about-title{font-size:18px}
-
-  /* --- FOOTER --- */
-  footer{padding:24px 14px 14px}
-  .footer-links{gap:12px}
-  .footer-links a{font-size:11px}
-
-  /* --- TOAST --- */
-  #toast{font-size:12px;padding:9px 18px;max-width:calc(100% - 24px);white-space:normal;text-align:center}
-}
+/* RESPONSIVE — viewport fixé à 1200px, identique PC et mobile */
 
 /* STRIPE PAYMENT MODAL */
 #stripe-overlay{position:fixed;inset:0;background:rgba(10,5,20,.95);z-index:700;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:20px}
