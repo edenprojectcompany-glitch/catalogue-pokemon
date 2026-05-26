@@ -1266,7 +1266,7 @@ function buildCard(p,q){
   const status=getStockStatus(p.id,q||1);
   const stockEl=document.createElement('div');
   stockEl.className='stock-badge stock-'+status;
-  if(status==='fr')stockEl.textContent='\u2022 '+t('stockFr');
+  if(status==='fr'){const _s=STOCK[p.id];if(_s&&_s.fr>0&&_s.fr<=4){stockEl.textContent='⚡ Plus que '+_s.fr+' en stock FR';stockEl.style.color='#f87171';}else stockEl.textContent='\u2022 '+t('stockFr');}
   else if(status==='asia'||status==='mixed')stockEl.textContent='\u25cb '+t('stockAsia');
   else stockEl.textContent='\u2715 '+t('outStock');
   body.appendChild(stockEl);
@@ -1374,6 +1374,7 @@ function addCart(id){
   const pr=getPrice(p,q);if(!pr)return;
   cart[id]={p,q,pr};
   renderCart();showToast(p.ref+' '+t('toaster'));
+  const _b=document.querySelector('#c-'+id+' .add-btn');if(_b)flyToCart(_b);
   document.getElementById('cart-panel').classList.remove('hidden');
   if(!cartOpen)toggleCart();
 }
@@ -1414,6 +1415,7 @@ function renderCart(){
   if (discVal && discount > 0) discVal.textContent = '-' + discount + ' € (' + activeCoupon.pct + '%)';
   document.getElementById('cart-total').textContent=total+' \u20ac';
   document.getElementById('cart-shipping-info').textContent=t('shippingFr')+' / '+t('shippingEu');
+  updateCartProgress();
 
   const list=document.getElementById('cart-list');
   if(!items.length){list.innerHTML='<div class="cart-empty">'+t('emptyCart')+' \uD83C\uDF38</div>';return;}
@@ -1660,8 +1662,8 @@ function doLogin() {
   err.textContent = '';
   if (!email || !pwd) { err.textContent = 'Veuillez remplir tous les champs.'; return; }
   const users = DB.getUsers();
-  const user = users.find(u => u.email === email && u.password === pwd);
-  if (!user) { err.textContent = 'Email ou mot de passe incorrect.'; return; }
+  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === pwd.trim());
+  if (!user) { const exists=users.find(u=>u.email.toLowerCase()===email.toLowerCase()); err.textContent=exists?'Mot de passe incorrect.':'Aucun compte avec cet email.'; return; }
   DB.setCurrent(user);
   closeAuth();
   updateAuthHeader();
@@ -1683,12 +1685,13 @@ function doSignup() {
   const err = document.getElementById('signup-error');
   err.textContent = '';
   if (!prenom || !nom || !email || !pwd) { err.textContent = 'Les champs * sont obligatoires.'; return; }
-  if (pwd.length < 8) { err.textContent = 'Mot de passe : 8 caractères minimum.'; return; }
+  const emailN=email.toLowerCase().trim(), pwdT=pwd.trim();
+  if(pwdT.length<8){err.textContent='Mot de passe : 8 caractères minimum.';return;}
   const users = DB.getUsers();
-  if (users.find(u => u.email === email)) { err.textContent = 'Cet email est déjà utilisé.'; return; }
+  if (users.find(u => u.email.toLowerCase() === emailN)) { err.textContent = 'Cet email est déjà utilisé.'; return; }
   const newUser = {
-    id: Date.now(), prenom, nom, email, tel, adresse, cp, ville,
-    password: pwd, wheelUsed: false, coupon: null,
+    id: Date.now(), prenom:prenom.trim(), nom:nom.trim(), email:emailN, tel, adresse, cp, ville,
+    password: pwdT, wheelUsed: false, coupon: null,
     couponUsed: false, createdAt: new Date().toISOString(),
     lastSpin: null
   };
@@ -2066,6 +2069,8 @@ function openStripePayment() {
   if (!items.length) { showToast('Votre panier est vide 🌸'); return; }
   const { total } = getCartTotal();
   document.getElementById('stripe-amount-display').textContent = total + ' €';
+  buildStripeCartSummary();
+  buildStripeCartSummary();
   document.getElementById('stripe-overlay').classList.add('open');
   setTimeout(initStripe, 150);
 }
@@ -2481,7 +2486,75 @@ function searchRelayInStripe() {
     };
     list.appendChild(div);
   });
-}</script>
+}
+
+// ── STRIPE CART SUMMARY ──────────────────────────────────────
+function toggleStripeCart(){
+  const tog=document.getElementById('stripe-cart-toggle');
+  const lst=document.getElementById('stripe-cart-items');
+  const open=lst.classList.toggle('open');
+  tog.classList.toggle('open',open);
+}
+function buildStripeCartSummary(){
+  const c=document.getElementById('stripe-cart-items');
+  if(!c)return;
+  const {discount}=getCartTotal();
+  c.innerHTML='';
+  Object.values(cart).forEach(i=>{
+    const d=document.createElement('div');d.className='stripe-cart-item';
+    d.innerHTML='<span class="stripe-cart-item-name">'+i.p.ref+'</span><span class="stripe-cart-item-qty">'+i.q+' x '+i.pr+'€</span><span class="stripe-cart-item-price">'+(i.pr*i.q)+'€</span>';
+    c.appendChild(d);
+  });
+  if(discount>0&&activeCoupon){
+    const d=document.createElement('div');d.className='stripe-cart-item';
+    d.innerHTML='<span class="stripe-cart-item-name" style="color:#4ade80">Code '+activeCoupon.code+'</span><span class="stripe-cart-item-qty">-'+activeCoupon.pct+'%</span><span class="stripe-cart-item-price" style="color:#4ade80">-'+discount+'€</span>';
+    c.appendChild(d);
+  }
+}
+// ── CART PROGRESS BAR ─────────────────────────────────────────
+function updateCartProgress(){
+  const wrap=document.getElementById('cart-progress-wrap');
+  if(!wrap)return;
+  const items=Object.values(cart);
+  if(!items.length){wrap.style.display='none';return;}
+  let best=null;
+  items.forEach(i=>{
+    const nxt=getNextTier(i.p,i.q);
+    if(nxt&&nxt.p!==null){
+      const saving=getPrice(i.p,i.q)-nxt.p;
+      if(!best||saving>best.saving)best={ref:i.p.ref,needed:nxt.q-i.q,saving,currentQ:i.q,nextQ:nxt.q};
+    }
+  });
+  if(!best){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  document.getElementById('cart-progress-fill').style.width=Math.min(95,Math.round(best.currentQ/best.nextQ*100))+'%';
+  document.getElementById('cart-progress-label').textContent='Progression vers la prochaine remise';
+  document.getElementById('cart-progress-next').textContent='Encore '+best.needed+' boite(s) de '+best.ref+' pour -'+best.saving+'€/boite !';
+}
+// ── ORDER CONFIRMATION ────────────────────────────────────────
+function showConfirmation(total){
+  document.getElementById('confirm-order-num').textContent='#EDEN-'+Date.now().toString().slice(-6);
+  const user=DB.getCurrent(),relay=window.stripeRelayPoint||window.selectedRelayPoint;
+  const items=Object.values(cart);
+  let html=items.map(i=>'<div class="confirm-detail-row"><span class="confirm-detail-lbl">'+i.p.ref+'</span><span class="confirm-detail-val">'+i.q+' x '+i.pr+'€ = '+(i.pr*i.q)+'€</span></div>').join('');
+  html+='<div class="confirm-detail-row" style="border-top:1px solid rgba(255,133,161,.15);margin-top:6px;padding-top:8px"><span class="confirm-detail-lbl">Total</span><span class="confirm-detail-val" style="color:var(--gold-l);font-size:1rem">'+total+'€</span></div>';
+  if(relay)html+='<div class="confirm-detail-row"><span class="confirm-detail-lbl">Point relais</span><span class="confirm-detail-val">'+relay.name+'</span></div>';
+  if(user)html+='<div class="confirm-detail-row"><span class="confirm-detail-lbl">Email</span><span class="confirm-detail-val">'+user.email+'</span></div>';
+  html+='<div class="confirm-detail-row"><span class="confirm-detail-lbl">Expedition</span><span class="confirm-detail-val">Sous 24h</span></div>';
+  document.getElementById('confirm-details').innerHTML=html;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('open');}
+// ── FLY TO CART ───────────────────────────────────────────────
+function flyToCart(src){
+  const dst=document.getElementById('cart-count');
+  if(!dst||!src)return;
+  const s=src.getBoundingClientRect(),d=dst.getBoundingClientRect();
+  const el=document.createElement('div');el.className='fly-item';
+  el.style.cssText='left:'+(s.left+s.width/2-20)+'px;top:'+(s.top+s.height/2-20)+'px;--fly-x:'+(d.left-s.left-s.width/2+20)+'px;--fly-y:'+(d.top-s.top-s.height/2+20)+'px';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),700);
+}
+</script>
 
 <!-- PROFILE MODAL -->
 <div id="profile-overlay">
@@ -2562,6 +2635,13 @@ function searchRelayInStripe() {
     <div class="stripe-amount-display">
       <span class="stripe-amount-label">Total commande</span>
       <span class="stripe-amount-value" id="stripe-amount-display">0 €</span>
+    </div>
+    <div class="stripe-cart-summary">
+      <button class="stripe-cart-toggle" id="stripe-cart-toggle" onclick="toggleStripeCart()">
+        <span>Voir le detail de ma commande</span>
+        <span class="stripe-cart-toggle-arrow">&#9660;</span>
+      </button>
+      <div class="stripe-cart-items" id="stripe-cart-items"></div>
     </div>
     <!-- STEP 1: Relay choice -->
     <div id="stripe-step-relay" style="margin-bottom:14px">
