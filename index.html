@@ -644,7 +644,7 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
   <div class="divider-sakura"><span>&#x2665;</span></div>
 </section>
 <div style="text-align:center;margin:-16px 0 20px;position:relative;z-index:10">
-  <span id="ebay-live-badge" style="display:inline-block;padding:5px 16px;border-radius:50px;font-size:11px;font-weight:600;letter-spacing:.06em;background:rgba(100,100,120,.1);color:#8888aa;transition:all .5s">
+  <span id="ebay-live-badge" style="display:inline-block;padding:5px 16px;border-radius:50px;font-size:11px;font-weight:600;letter-spacing:.06em;background:rgba(100,100,120,.1);color:#8888aa;transition:all .5s;cursor:pointer" onclick="refreshEbayPrices()">
     Prix marché eBay (référence)
   </span>
 </div>
@@ -2770,6 +2770,25 @@ function flyToCart(src){
 </div>
 
 
+
+<script>
+function refreshEbayPrices(){
+  var badge=document.getElementById('ebay-live-badge');
+  if(badge){badge.textContent='Actualisation...';}
+  fetch('/api/ebay-prices?t='+Date.now())
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(data&&data.prices){
+        var n=0;
+        Object.entries(data.prices).forEach(function(e){if(e[1]>0){ebay[e[0]]=e[1];n++;}});
+        renderGrid();
+        if(badge){badge.textContent='Prix mis a jour - '+n+' produits';badge.style.color='#4ade80';}
+        showToast('Prix eBay actualises !');
+      }
+    })
+    .catch(function(){showToast('Erreur actualisation eBay');});
+}
+</script>
 
 </body>
 </html>
