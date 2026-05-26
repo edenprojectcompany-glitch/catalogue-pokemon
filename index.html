@@ -1604,10 +1604,18 @@ document.getElementById('detail-overlay').addEventListener('click',function(e){i
 renderGrid();
 renderCart();
 
-// Fetch live eBay prices from prices.json (updated every 6h by GitHub Actions)
-fetch('prices.json')
-  .then(r => r.json())
-  .then(data => {
+// Fetch live eBay prices from our Vercel API
+(async function fetchEbayPrices() {
+  const badge = document.getElementById('ebay-live-badge');
+  if (badge) {
+    badge.textContent = '🔄 Chargement des prix eBay...';
+    badge.style.background = 'rgba(100,100,120,.1)';
+    badge.style.color = '#8888aa';
+  }
+  try {
+    const resp = await fetch('/api/ebay-prices');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
     if (data && data.prices) {
       let updated = 0;
       Object.entries(data.prices).forEach(([id, price]) => {
@@ -1615,20 +1623,26 @@ fetch('prices.json')
       });
       if (updated > 0) {
         renderGrid();
-        const badge = document.getElementById('ebay-live-badge');
         if (badge) {
           const d = new Date(data.updated);
-          const hours = Math.round((Date.now() - d.getTime()) / 3600000);
-          badge.textContent = '\u2714 Prix eBay EN DIRECT \u00b7 Mis \u00e0 jour il y a ' + (hours < 1 ? 'moins d\'1h' : hours + 'h');
-          badge.style.background = 'rgba(46,125,50,.12)';
-          badge.style.color = '#2e7d32';
+          const mins = Math.round((Date.now() - d.getTime()) / 60000);
+          const timeStr = mins < 2 ? 'à l\'instant' : mins < 60 ? 'il y a ' + mins + 'min' : 'il y a ' + Math.round(mins/60) + 'h';
+          badge.innerHTML = '✅ Prix eBay EN DIRECT · ' + updated + ' produits · ' + timeStr;
+          badge.style.background = 'rgba(46,125,50,.15)';
+          badge.style.color = '#4ade80';
+          badge.style.borderColor = 'rgba(74,222,128,.3)';
         }
       }
     }
-  })
-  .catch(() => {
-    // Silently fail — static prices already shown
-  });
+  } catch(err) {
+    console.warn('eBay API unavailable, using static prices:', err.message);
+    if (badge) {
+      badge.textContent = 'Prix marché eBay (référence)';
+      badge.style.background = 'rgba(100,100,120,.1)';
+      badge.style.color = '#8888aa';
+    }
+  }
+})();
 
 // ══════════════════════════════════════════════════════════════════════════════
 // AUTH SYSTEM — Base de données clients (localStorage)
