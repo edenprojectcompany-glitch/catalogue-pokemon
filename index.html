@@ -2134,48 +2134,111 @@ async function spinWheel() {
   const user = DB.getCurrent();
   if (!user || wheelSpinning) return;
 
-  // Vérification cross-device via Upstash avant de lancer
+  const btn = document.getElementById('btn-spin');
+  btn.disabled = true;
+  btn.textContent = '⏳ Vérification...';
+
+  // ── ÉTAPE 1 : vérification GET côté serveur ──────────────────────────────
   try {
     const chk = await fetch(`/api/record-spin?email=${encodeURIComponent(user.email)}`);
     if (chk.ok) {
       const chkData = await chk.json();
       if (!chkData.canSpin) {
-        // Sync local avec Upstash
-        const spinTs = chkData.nextSpin - 30*24*60*60*1000;
+        // Sync localStorage avec Redis
+        const lastSpinTs = chkData.nextSpin - 30*24*60*60*1000;
         const users = DB.getUsers();
         const uIdx = users.findIndex(u => u.id === user.id);
         if (uIdx !== -1) {
           users[uIdx].wheelUsed = true;
-          users[uIdx].lastSpin = new Date(spinTs).toISOString();
+          users[uIdx].lastSpin = new Date(lastSpinTs).toISOString();
           DB.saveUsers(users);
           DB.setCurrent(users[uIdx]);
         }
-        showToast('Roue déjà utilisée sur un autre appareil 🔒');
+        showToast('🔒 Roue déjà utilisée ce mois-ci');
         checkWheelBtnState();
         updateWheelBanner();
         return;
       }
     }
   } catch(e) {
-    // En cas d'erreur réseau, on se fie au localStorage
-    if (!canSpin(user)) return;
+    // Réseau indisponible → vérification locale
+    if (!canSpin(user)) {
+      checkWheelBtnState();
+      return;
+    }
   }
 
-  if (!canSpin(user)) return;
-
-  // Anti-fraud fingerprint check
-  const banned = await isFingerprintBanned(user.id);
-  if (banned) {
-    showToast('Une tentative a déjà été utilisée depuis cet appareil. 🔒');
-    document.getElementById('btn-spin').disabled = true;
-    document.getElementById('btn-spin').textContent = '🔒 Appareil déjà utilisé';
+  // Vérification locale en dernier recours
+  if (!canSpin(user)) {
+    checkWheelBtnState();
     return;
   }
+
+  // ── ÉTAPE 2 : calcul du résultat AVANT animation ─────────────────────────
+  const winIdx = pickWheelSeg();
+  const seg = WHEEL_SEGS[winIdx];
+  const fp = await getFingerprint();
+  const couponData = { code: seg.code, desc: seg.desc, tier: seg.tier, minAchat: seg.minAchat, used: false };
+
+  // ── ÉTAPE 3 : POST serveur — enregistrement atomique dans Redis ───────────
+  try {
+    const saveRes = await fetch('/api/record-spin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email, coupon: couponData, fp })
+    });
+    const saveData = await saveRes.json();
+
+    if (!saveRes.ok || saveData.error) {
+      // Refus serveur (déjà spinné entre temps)
+      if (saveData.nextSpin) {
+        const users = DB.getUsers();
+        const uIdx = users.findIndex(u => u.id === user.id);
+        if (uIdx !== -1) {
+          users[uIdx].wheelUsed = true;
+          users[uIdx].lastSpin = new Date(saveData.nextSpin - 30*24*60*60*1000).toISOString();
+          DB.saveUsers(users);
+          DB.setCurrent(users[uIdx]);
+        }
+      }
+      showToast('🔒 Spin déjà enregistré sur ce compte');
+      checkWheelBtnState();
+      updateWheelBanner();
+      return;
+    }
+
+    // Sync localStorage immédiatement
+    const spinDate = saveData.lastSpin || new Date().toISOString();
+    const users = DB.getUsers();
+    const uIdx = users.findIndex(u => u.id === user.id);
+    if (uIdx !== -1) {
+      users[uIdx].wheelUsed = true;
+      users[uIdx].lastSpin = spinDate;
+      users[uIdx].coupon = couponData;
+      DB.saveUsers(users);
+      DB.setCurrent(users[uIdx]);
+    }
+    if (fp) recordSpinFingerprint(user.id);
+
+  } catch(e) {
+    // Erreur réseau : on sauvegarde localement et on continue
+    const spinDate = new Date().toISOString();
+    const users = DB.getUsers();
+    const uIdx = users.findIndex(u => u.id === user.id);
+    if (uIdx !== -1) {
+      users[uIdx].wheelUsed = true;
+      users[uIdx].lastSpin = spinDate;
+      users[uIdx].coupon = couponData;
+      DB.saveUsers(users);
+      DB.setCurrent(users[uIdx]);
+    }
+  }
+
+  // ── ÉTAPE 4 : animation de la roue ───────────────────────────────────────
   wheelSpinning = true;
-  document.getElementById('btn-spin').disabled = true;
+  btn.disabled = true;
   document.getElementById('wheel-result-box').classList.remove('show');
 
-  const winIdx = pickWheelSeg();
   const n = WHEEL_SEGS.length;
   const arc = 360 / n;
   const targetDeg = 360 - (winIdx * arc + arc/2);
@@ -2200,7 +2263,7 @@ async function spinWheel() {
     } else {
       wheelCurrentRot = (wheelCurrentRot + totalRot) % 360;
       wheelSpinning = false;
-      showWheelResult(winIdx, user);
+      showWheelResult(winIdx, DB.getCurrent());
     }
   }
   requestAnimationFrame(frame);
@@ -2218,28 +2281,7 @@ function showWheelResult(idx, user) {
   document.getElementById('wres-code').textContent = seg.code;
   box.classList.add('show');
 
-  // Save to user + mark wheel used (localStorage + Upstash sync)
-  const spinDate = new Date().toISOString();
-  const couponData = { code: seg.code, desc: seg.desc, tier: seg.tier, minAchat: seg.minAchat, used: false };
-  const users = DB.getUsers();
-  const uIdx = users.findIndex(u => u.id === user.id);
-  if (uIdx !== -1) {
-    users[uIdx].wheelUsed = true;
-    users[uIdx].lastSpin = spinDate;
-    users[uIdx].coupon = couponData;
-    DB.saveUsers(users);
-    DB.setCurrent(users[uIdx]);
-    recordSpinFingerprint(users[uIdx].id);
-    // Sync vers Upstash pour cross-device
-    fetch('/api/user', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        email: user.email,
-        updates: { wheelUsed: true, lastSpin: spinDate, coupon: couponData }
-      })
-    }).catch(() => {});
-  }
+  // La sauvegarde Redis + localStorage est déjà faite dans spinWheel() avant l'animation
 
   // Animations
   if (isGolden) triggerGolden();
@@ -2249,7 +2291,7 @@ function showWheelResult(idx, user) {
 
   updateWheelBanner();
   updateCouponStrip();
-  checkWheelBtnState(); // Lance le countdown live
+  checkWheelBtnState(); // Lance le countdown live avec la date Redis
 }
 
 function triggerConfetti(count, colors) {

@@ -1,4 +1,4 @@
-// api/record-spin.js — Vérifie et enregistre les spins côté serveur (Upstash Redis)
+// api/record-spin.js — Spin unique par compte, vérifié côté serveur (Redis source de vérité)
 import { Redis } from '@upstash/redis';
 const redis = Redis.fromEnv();
 
@@ -11,13 +11,17 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
+    const getUser = async (email) => {
+      const key = `user:${email.toLowerCase().trim()}`;
+      return await redis.get(key);
+    };
+
+    // ── GET : vérifie si l'utilisateur peut spinner ─────────────────────────
     if (req.method === 'GET') {
-      // Vérifier le statut du spin pour un email donné
       const { email } = req.query;
       if (!email) return res.status(400).json({ error: 'Email requis' });
 
-      const key = `user:${email.toLowerCase().trim()}`;
-      const user = await redis.get(key);
+      const user = await getUser(email);
       if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
 
       const lastSpin = user.lastSpin ? new Date(user.lastSpin).getTime() : null;
@@ -28,34 +32,58 @@ export default async function handler(req, res) {
       if (elapsed >= THIRTY_DAYS_MS) {
         return res.json({ canSpin: true, nextSpin: null });
       }
-      return res.json({ canSpin: false, nextSpin: lastSpin + THIRTY_DAYS_MS });
+      const nextSpin = lastSpin + THIRTY_DAYS_MS;
+      return res.json({ canSpin: false, nextSpin });
     }
 
+    // ── POST : tente d'enregistrer le spin (atomique) ────────────────────────
     if (req.method === 'POST') {
-      // Enregistrer un spin anti-fraude (fingerprint + IP)
-      const { fp, userId, date, email } = req.body;
+      const { email, coupon, fp } = req.body;
+      if (!email) return res.status(400).json({ error: 'Email requis' });
+
+      const emailKey = email.toLowerCase().trim();
+      const key = `user:${emailKey}`;
+      const user = await redis.get(key);
+      if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+
+      // Vérification serveur : déjà spinné dans les 30 jours ?
+      const lastSpin = user.lastSpin ? new Date(user.lastSpin).getTime() : null;
+      if (lastSpin && user.wheelUsed) {
+        const elapsed = Date.now() - lastSpin;
+        if (elapsed < THIRTY_DAYS_MS) {
+          const nextSpin = lastSpin + THIRTY_DAYS_MS;
+          return res.status(403).json({
+            error: 'Spin déjà utilisé',
+            canSpin: false,
+            nextSpin
+          });
+        }
+      }
+
+      // OK → enregistrer le spin dans Redis
+      const now = new Date().toISOString();
       const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
-               || req.headers['x-real-ip']
-               || 'unknown';
+               || req.headers['x-real-ip'] || 'unknown';
 
-      console.log(JSON.stringify({
-        event: 'wheel_spin',
-        fingerprint: fp,
-        userId,
-        ip,
-        date,
-        userAgent: req.headers['user-agent']?.substring(0, 100)
-      }));
+      const updated = {
+        ...user,
+        wheelUsed: true,
+        lastSpin: now,
+        coupon: coupon || user.coupon || null
+      };
+      await redis.set(key, updated);
 
-      // Stocker anti-fraude cross-device
+      // Anti-fraude fingerprint
       if (fp) {
-        await redis.set(`spin:fp:${fp}`, { userId, ip, date }, { ex: 30*24*60*60 });
+        await redis.set(`spin:fp:${fp}`, { userId: user.id, ip, date: now }, { ex: 30*24*60*60 });
       }
       if (ip && ip !== 'unknown') {
-        await redis.set(`spin:ip:${ip}`, { userId, fp, date }, { ex: 30*24*60*60 });
+        await redis.set(`spin:ip:${ip}`, { userId: user.id, fp, date: now }, { ex: 30*24*60*60 });
       }
 
-      return res.status(200).json({ ok: true });
+      console.log(JSON.stringify({ event: 'wheel_spin_recorded', email: emailKey, ip, date: now }));
+
+      return res.status(200).json({ ok: true, lastSpin: now });
     }
 
     return res.status(405).json({ error: 'Méthode non autorisée' });
