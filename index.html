@@ -1829,25 +1829,37 @@ function switchAuthTab(tab) {
   document.getElementById('auth-modal-sub').textContent = tab === 'login' ? 'Connectez-vous à votre compte' : 'Rejoignez Eden Project';
 }
 
-function doLogin() {
+async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
-  const pwd = document.getElementById('login-password').value;
+  const pwd = document.getElementById('login-password').value.trim();
   const err = document.getElementById('login-error');
+  const btn = document.querySelector('#auth-form-login .auth-submit-btn');
   err.textContent = '';
   if (!email || !pwd) { err.textContent = 'Veuillez remplir tous les champs.'; return; }
-  const users = DB.getUsers();
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === pwd.trim());
-  if (!user) { const exists=users.find(u=>u.email.toLowerCase()===email.toLowerCase()); err.textContent=exists?'Mot de passe incorrect.':'Aucun compte avec cet email.'; return; }
-  DB.setCurrent(user);
-  closeAuth();
-  updateAuthHeader();
-  updateWheelBanner();
-  updateCouponStrip();
-  showToast('Bienvenue ' + user.prenom + ' ! 🌸');
-  showWheelPopupIfEligible(user);
+  if (btn) { btn.disabled = true; btn.textContent = 'Connexion...'; }
+  try {
+    const resp = await fetch('/api/login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password: pwd })
+    });
+    const data = await resp.json();
+    if (!resp.ok) { err.textContent = data.error || 'Erreur connexion.'; return; }
+    DB.setCurrent(data.user);
+    closeAuth();
+    updateAuthHeader();
+    updateWheelBanner();
+    updateCouponStrip();
+    showToast('Bienvenue ' + data.user.prenom + ' ! 🌸');
+    showWheelPopupIfEligible(data.user);
+  } catch(e) {
+    err.textContent = 'Erreur réseau. Réessayez.';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Se connecter'; }
+  }
 }
 
-function doSignup() {
+async function doSignup() {
   const prenom = document.getElementById('reg-prenom').value.trim();
   const nom = document.getElementById('reg-nom').value.trim();
   const email = document.getElementById('reg-email').value.trim();
@@ -1855,40 +1867,41 @@ function doSignup() {
   const adresse = document.getElementById('reg-adresse').value.trim();
   const cp = document.getElementById('reg-cp').value.trim();
   const ville = document.getElementById('reg-ville').value.trim();
-  const pwd = document.getElementById('reg-password').value;
+  const pwd = document.getElementById('reg-password').value.trim();
   const err = document.getElementById('signup-error');
+  const btn = document.querySelector('#auth-form-signup .auth-submit-btn');
   err.textContent = '';
   if (!prenom || !nom || !email || !pwd) { err.textContent = 'Les champs * sont obligatoires.'; return; }
-  const emailN=email.toLowerCase().trim(), pwdT=pwd.trim();
-  if(pwdT.length<8){err.textContent='Mot de passe : 8 caractères minimum.';return;}
-  const users = DB.getUsers();
-  if (users.find(u => u.email.toLowerCase() === emailN)) { err.textContent = 'Cet email est déjà utilisé.'; return; }
-  const newUser = {
-    id: Date.now(), prenom:prenom.trim(), nom:nom.trim(), email:emailN, tel, adresse, cp, ville,
-    password: pwdT, wheelUsed: false, coupon: null,
-    couponUsed: false, createdAt: new Date().toISOString(),
-    lastSpin: null
-  };
-  users.push(newUser);
-  DB.saveUsers(users);
-  DB.setCurrent(newUser);
-  // Send to Vercel API (non-blocking)
-  const apiPayload = {prenom, nom, email, tel, adresse, cp, ville, createdAt: newUser.createdAt};
-  fetch('/api/register', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(apiPayload)
-  }).catch(()=>{}); // Silent fail if not on Vercel
-  document.getElementById('auth-form-signup').style.display = 'none';
-  document.getElementById('auth-form-login').style.display = 'none';
-  document.getElementById('auth-form-success').style.display = '';
-  document.getElementById('auth-success-title').textContent = 'Bienvenue, ' + prenom + ' ! 🌸';
-  document.getElementById('auth-success-msg').textContent = 'Compte créé ! Vous avez accès à la Roue de la Fortune.';
-  updateAuthHeader();
-  updateWheelBanner();
-  updateCouponStrip();
-  showToast('Compte créé, ' + prenom + ' ! 🌸');
-  showWheelPopupIfEligible(newUser);
+  if (pwd.length < 8) { err.textContent = 'Mot de passe : 8 caractères minimum.'; return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Création...'; }
+  try {
+    const resp = await fetch('/api/register', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        prenom, nom, email, tel, adresse, cp, ville, password: pwd,
+        wheelUsed: false, coupon: null, lastSpin: null,
+        createdAt: new Date().toISOString()
+      })
+    });
+    const data = await resp.json();
+    if (!resp.ok) { err.textContent = data.error || 'Erreur inscription.'; return; }
+    DB.setCurrent(data.user);
+    document.getElementById('auth-form-signup').style.display = 'none';
+    document.getElementById('auth-form-login').style.display = 'none';
+    document.getElementById('auth-form-success').style.display = '';
+    document.getElementById('auth-success-title').textContent = 'Bienvenue, ' + prenom + ' ! 🌸';
+    document.getElementById('auth-success-msg').textContent = 'Compte créé ! Vous avez accès à la Roue de la Fortune.';
+    updateAuthHeader();
+    updateWheelBanner();
+    updateCouponStrip();
+    showToast('Compte créé, ' + prenom + ' ! 🌸');
+    showWheelPopupIfEligible(data.user);
+  } catch(e) {
+    err.textContent = 'Erreur réseau. Réessayez.';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "S'inscrire"; }
+  }
 }
 
 function doLogout() {
@@ -2339,7 +2352,7 @@ function openProfile() {
 function closeProfile() {
   document.getElementById('profile-overlay').classList.remove('open');
 }
-function saveProfile() {
+async function saveProfile() {
   const user = DB.getCurrent();
   if (!user) return;
   const prenom = document.getElementById('pf-prenom').value.trim();
@@ -2351,21 +2364,28 @@ function saveProfile() {
   const ville = document.getElementById('pf-ville').value.trim();
   const pwd = document.getElementById('pf-pwd').value;
   if (!prenom || !nom || !email) { showToast('Les champs * sont obligatoires'); return; }
-  const users = DB.getUsers();
-  const idx = users.findIndex(u => u.id === user.id);
-  if (idx === -1) return;
-  users[idx] = { ...users[idx], prenom, nom, email, tel, adresse, cp, ville };
-  if (pwd && pwd.length >= 8) users[idx].password = pwd;
-  else if (pwd && pwd.length > 0) { showToast('Mot de passe : 8 caractères minimum'); return; }
-  DB.saveUsers(users);
-  DB.setCurrent(users[idx]);
-  document.getElementById('profile-avatar-big').textContent = (prenom[0]+nom[0]).toUpperCase();
-  document.getElementById('profile-fullname').textContent = prenom + ' ' + nom;
-  document.getElementById('profile-email-lbl').textContent = email;
-  document.getElementById('profile-success').style.display = 'block';
-  updateAuthHeader();
-  showToast('Profil mis à jour ! 🌸');
-  setTimeout(() => { document.getElementById('profile-success').style.display = 'none'; }, 3000);
+  if (pwd && pwd.length > 0 && pwd.length < 8) { showToast('Mot de passe : 8 caractères minimum'); return; }
+  const updates = { prenom, nom, tel, adresse, cp, ville };
+  if (pwd && pwd.length >= 8) updates.password = pwd;
+  try {
+    const resp = await fetch('/api/user', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email: user.email, updates })
+    });
+    const data = await resp.json();
+    if (!resp.ok) { showToast(data.error || 'Erreur mise à jour'); return; }
+    DB.setCurrent(data.user);
+    document.getElementById('profile-avatar-big').textContent = (prenom[0]+nom[0]).toUpperCase();
+    document.getElementById('profile-fullname').textContent = prenom + ' ' + nom;
+    document.getElementById('profile-email-lbl').textContent = email;
+    document.getElementById('profile-success').style.display = 'block';
+    updateAuthHeader();
+    showToast('Profil mis à jour ! 🌸');
+    setTimeout(() => { document.getElementById('profile-success').style.display = 'none'; }, 3000);
+  } catch(e) {
+    showToast('Erreur réseau. Réessayez.');
+  }
 }
 document.getElementById('profile-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeProfile();
