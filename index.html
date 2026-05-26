@@ -2091,13 +2091,23 @@ function canSpin(user) {
   return diffDays >= 30;
 }
 
-function daysUntilNextSpin(user) {
+function nextSpinTimestamp(user) {
   if (!user || !user.lastSpin) return 0;
-  const last = new Date(user.lastSpin);
-  const now = new Date();
-  const diffDays = (now - last) / (1000 * 60 * 60 * 24);
-  return Math.max(0, Math.ceil(30 - diffDays));
+  return new Date(user.lastSpin).getTime() + 30 * 24 * 60 * 60 * 1000;
 }
+
+function formatCountdown(ms) {
+  if (ms <= 0) return '0s';
+  const d = Math.floor(ms / 86400000);
+  const h = Math.floor((ms % 86400000) / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  if (d > 0) return `${d}j ${h}h ${m}m`;
+  if (h > 0) return `${h}h ${m}m ${s}s`;
+  return `${m}m ${s}s`;
+}
+
+let _wheelBtnInterval = null;
 
 function checkWheelBtnState() {
   const user = DB.getCurrent();
@@ -2105,16 +2115,55 @@ function checkWheelBtnState() {
   if (!user) { btn.disabled = true; btn.textContent = '🔒 Connexion requise'; return; }
   if (!canSpin(user)) {
     btn.disabled = true;
-    btn.textContent = `⏳ Disponible dans ${daysUntilNextSpin(user)} jour(s)`;
+    if (_wheelBtnInterval) clearInterval(_wheelBtnInterval);
+    const next = nextSpinTimestamp(user);
+    const tick = () => {
+      const rem = next - Date.now();
+      if (rem <= 0) { clearInterval(_wheelBtnInterval); checkWheelBtnState(); return; }
+      btn.textContent = `⏳ ${formatCountdown(rem)}`;
+    };
+    tick();
+    _wheelBtnInterval = setInterval(tick, 1000);
     return;
   }
+  if (_wheelBtnInterval) { clearInterval(_wheelBtnInterval); _wheelBtnInterval = null; }
   btn.disabled = false; btn.textContent = 'TOURNER !';
 }
 
 async function spinWheel() {
   const user = DB.getCurrent();
-  if (!user || !canSpin(user) || wheelSpinning) return;
-  // Anti-fraud check
+  if (!user || wheelSpinning) return;
+
+  // Vérification cross-device via Upstash avant de lancer
+  try {
+    const chk = await fetch(`/api/record-spin?email=${encodeURIComponent(user.email)}`);
+    if (chk.ok) {
+      const chkData = await chk.json();
+      if (!chkData.canSpin) {
+        // Sync local avec Upstash
+        const spinTs = chkData.nextSpin - 30*24*60*60*1000;
+        const users = DB.getUsers();
+        const uIdx = users.findIndex(u => u.id === user.id);
+        if (uIdx !== -1) {
+          users[uIdx].wheelUsed = true;
+          users[uIdx].lastSpin = new Date(spinTs).toISOString();
+          DB.saveUsers(users);
+          DB.setCurrent(users[uIdx]);
+        }
+        showToast('Roue déjà utilisée sur un autre appareil 🔒');
+        checkWheelBtnState();
+        updateWheelBanner();
+        return;
+      }
+    }
+  } catch(e) {
+    // En cas d'erreur réseau, on se fie au localStorage
+    if (!canSpin(user)) return;
+  }
+
+  if (!canSpin(user)) return;
+
+  // Anti-fraud fingerprint check
   const banned = await isFingerprintBanned(user.id);
   if (banned) {
     showToast('Une tentative a déjà été utilisée depuis cet appareil. 🔒');
@@ -2169,16 +2218,27 @@ function showWheelResult(idx, user) {
   document.getElementById('wres-code').textContent = seg.code;
   box.classList.add('show');
 
-  // Save to user + mark wheel used
+  // Save to user + mark wheel used (localStorage + Upstash sync)
+  const spinDate = new Date().toISOString();
+  const couponData = { code: seg.code, desc: seg.desc, tier: seg.tier, minAchat: seg.minAchat, used: false };
   const users = DB.getUsers();
   const uIdx = users.findIndex(u => u.id === user.id);
   if (uIdx !== -1) {
     users[uIdx].wheelUsed = true;
-    users[uIdx].lastSpin = new Date().toISOString();
-    recordSpinFingerprint(users[uIdx].id);
-    users[uIdx].coupon = { code: seg.code, desc: seg.desc, tier: seg.tier, minAchat: seg.minAchat, used: false };
+    users[uIdx].lastSpin = spinDate;
+    users[uIdx].coupon = couponData;
     DB.saveUsers(users);
     DB.setCurrent(users[uIdx]);
+    recordSpinFingerprint(users[uIdx].id);
+    // Sync vers Upstash pour cross-device
+    fetch('/api/user', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: user.email,
+        updates: { wheelUsed: true, lastSpin: spinDate, coupon: couponData }
+      })
+    }).catch(() => {});
   }
 
   // Animations
@@ -2189,7 +2249,7 @@ function showWheelResult(idx, user) {
 
   updateWheelBanner();
   updateCouponStrip();
-  document.getElementById('btn-spin').textContent = '⏳ Disponible dans 30 jours';
+  checkWheelBtnState(); // Lance le countdown live
 }
 
 function triggerConfetti(count, colors) {
@@ -2229,14 +2289,23 @@ function updateWheelBanner() {
     desc.innerHTML = "Inscrivez-vous pour tenter de gagner jusqu'à une <strong style=\"color:#fff\">display offerte</strong> !";
     cta.innerHTML = '<button class="wheel-banner-cta">Tourner maintenant →</button><div class="wheel-cta-hint">✨ Gratuit · Sans engagement</div><div class="wheel-cta-dots"><div class="wcd on"></div><div class="wcd on"></div><div class="wcd on"></div><div class="wcd"></div><div class="wcd"></div></div>';
   } else if (!canSpin(user)) {
-    const days = daysUntilNextSpin(user);
-    const last = new Date(user.lastSpin);
-    const nextDate = new Date(last.getTime() + 30*24*60*60*1000);
-    const diffMs = nextDate - new Date();
-    const diffH = Math.floor(diffMs / (1000*60*60)) % 24;
+    const next = nextSpinTimestamp(user);
+    const nextDate = new Date(next);
     const dateStr = nextDate.toLocaleDateString('fr-FR', {day:'numeric',month:'long'});
-    desc.innerHTML = `Prochaine tentative le <strong style="color:#fff">${dateStr}</strong> — dans ${days}j ${diffH}h 🗓️`;
-    cta.innerHTML = `<span class="wheel-used-badge">⏳ ${days}j ${diffH}h restants</span>`;
+    desc.innerHTML = `Prochaine tentative le <strong style="color:#fff">${dateStr}</strong> 🗓️`;
+    const countdownId = 'wb-countdown-' + Date.now();
+    cta.innerHTML = `<span class="wheel-used-badge">⏳ <span id="${countdownId}">...</span></span>`;
+    // Countdown live
+    if (window._wbCountdownInterval) clearInterval(window._wbCountdownInterval);
+    const tickBanner = () => {
+      const el = document.getElementById(countdownId);
+      if (!el) { clearInterval(window._wbCountdownInterval); return; }
+      const rem = next - Date.now();
+      if (rem <= 0) { clearInterval(window._wbCountdownInterval); updateWheelBanner(); return; }
+      el.textContent = formatCountdown(rem) + ' restants';
+    };
+    tickBanner();
+    window._wbCountdownInterval = setInterval(tickBanner, 1000);
   } else {
     desc.innerHTML = `Votre tentative est disponible, <strong style="color:#fff">${user.prenom}</strong> ! 🎡`;
     cta.innerHTML = '<button class="wheel-banner-cta">Jouer maintenant →</button><div class="wheel-cta-hint">✨ 1 tentative disponible</div><div class="wheel-cta-dots"><div class="wcd on"></div><div class="wcd on"></div><div class="wcd on"></div><div class="wcd on"></div><div class="wcd on"></div></div>';
