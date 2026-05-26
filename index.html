@@ -33,7 +33,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Zen Kaku Gothic New',sans-serif;color:var(--ink);background:var(--sakura-50);min-height:100vh;overflow-x:hidden;transition:background var(--trans),color var(--trans)}
+body{font-family:'Zen Kaku Gothic New',sans-serif;color:var(--ink);background:var(--sakura-50);min-height:100vh;overflow-x:clip;transition:background var(--trans),color var(--trans)}
 
 /* BG */
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;
@@ -316,7 +316,7 @@ main{position:relative;z-index:5;padding:0 16px 140px;max-width:1200px;margin:0 
 
 /* CART */
 /* cart-panel migré vers nouveau CSS */
-/* cart-panel.hidden migré */
+
 .cart-hd{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;border-bottom:1px solid rgba(255,133,161,.15);background:rgba(255,133,161,.05)}
 .cart-left{display:flex;align-items:center;gap:10px}
 .cart-icon-wrap{position:relative}
@@ -633,7 +633,23 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
 }
 
 /* ── PANIER : barre mini quand fermé ── */
-#cart-panel{position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:100;width:min(96vw,500px);background:linear-gradient(135deg,#1a0d20,#0d0a1a);border:1px solid rgba(255,133,161,.3);border-radius:var(--r) var(--r) 0 0;box-shadow:0 -4px 30px rgba(180,40,100,.3),0 0 0 1px rgba(255,133,161,.1);overflow:hidden;transition:all .4s cubic-bezier(.23,1,.32,1)}
+#cart-panel{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  z-index:9999;width:min(96vw,500px);
+  background:linear-gradient(135deg,#1a0d20,#0d0a1a);
+  border:1px solid rgba(255,133,161,.3);
+  border-radius:var(--r) var(--r) 0 0;
+  box-shadow:0 -4px 30px rgba(180,40,100,.3),0 0 0 1px rgba(255,133,161,.1);
+  overflow:hidden;
+  transition:transform .4s cubic-bezier(.23,1,.32,1),opacity .4s;
+  will-change:transform;
+  isolation:isolate;
+}
+#cart-panel.hidden{
+  transform:translateX(-50%) translateY(110%);
+  opacity:0;
+  pointer-events:none;
+}
 /* cart-panel.hidden migré */
 #cart-panel.minimized .cart-body{max-height:0 !important}
 </style>
