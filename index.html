@@ -588,6 +588,7 @@ footer{position:relative;z-index:5;background:var(--ink);padding:32px 20px 20px;
 
 </style>
 <script src="https://js.stripe.com/v3/"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
 </head>
 <body>
 
@@ -1640,6 +1641,65 @@ const DB = {
   logout: () => { try { localStorage.removeItem('eden_current'); } catch(e) {} },
 };
 
+
+// ══════════════════════════════════════════════════════════════════
+// ANTI-FRAUD — Fingerprint + IP tracking
+// ══════════════════════════════════════════════════════════════════
+let _fpPromise = null;
+
+function getFingerprint() {
+  if (!_fpPromise) {
+    if (typeof FingerprintJS !== 'undefined') {
+      _fpPromise = FingerprintJS.load().then(fp => fp.get()).then(r => r.visitorId);
+    } else {
+      // Fallback: build basic fingerprint from browser properties
+      const data = [
+        navigator.userAgent, navigator.language, screen.width+'x'+screen.height,
+        screen.colorDepth, new Date().getTimezoneOffset(),
+        navigator.hardwareConcurrency, navigator.deviceMemory||'?',
+        Intl.DateTimeFormat().resolvedOptions().timeZone
+      ].join('|');
+      let hash = 0;
+      for (let i=0; i<data.length; i++) { hash=((hash<<5)-hash)+data.charCodeAt(i); hash|=0; }
+      _fpPromise = Promise.resolve(Math.abs(hash).toString(36));
+    }
+  }
+  return _fpPromise;
+}
+
+async function checkSpinFraud() {
+  const fp = await getFingerprint();
+  const spins = JSON.parse(localStorage.getItem('eden_spins_fp') || '{}');
+  return { fp, spins };
+}
+
+async function recordSpinFingerprint(userId) {
+  const fp = await getFingerprint();
+  const spins = JSON.parse(localStorage.getItem('eden_spins_fp') || '{}');
+  spins[fp] = { userId, date: new Date().toISOString() };
+  localStorage.setItem('eden_spins_fp', JSON.stringify(spins));
+  // Also send to Vercel to track server-side
+  fetch('/api/record-spin', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ fp, userId, date: new Date().toISOString() })
+  }).catch(()=>{});
+}
+
+async function isFingerprintBanned(userId) {
+  const fp = await getFingerprint();
+  const spins = JSON.parse(localStorage.getItem('eden_spins_fp') || '{}');
+  const existingSpin = spins[fp];
+  if (!existingSpin) return false;
+  // Same fingerprint, different user = fraud attempt
+  if (existingSpin.userId !== userId) {
+    const last = new Date(existingSpin.date);
+    const diffDays = (new Date() - last) / (1000*60*60*24);
+    if (diffDays < 30) return true; // Block if < 30 days
+  }
+  return false;
+}
+
 function openAuth(tab) {
   document.getElementById('auth-overlay').classList.add('open');
   switchAuthTab(tab || 'login');
@@ -1863,9 +1923,17 @@ function checkWheelBtnState() {
   btn.disabled = false; btn.textContent = 'TOURNER !';
 }
 
-function spinWheel() {
+async function spinWheel() {
   const user = DB.getCurrent();
   if (!user || !canSpin(user) || wheelSpinning) return;
+  // Anti-fraud check
+  const banned = await isFingerprintBanned(user.id);
+  if (banned) {
+    showToast('Une tentative a déjà été utilisée depuis cet appareil. 🔒');
+    document.getElementById('btn-spin').disabled = true;
+    document.getElementById('btn-spin').textContent = '🔒 Appareil déjà utilisé';
+    return;
+  }
   wheelSpinning = true;
   document.getElementById('btn-spin').disabled = true;
   document.getElementById('wheel-result-box').classList.remove('show');
@@ -1919,6 +1987,7 @@ function showWheelResult(idx, user) {
   if (uIdx !== -1) {
     users[uIdx].wheelUsed = true;
     users[uIdx].lastSpin = new Date().toISOString();
+    recordSpinFingerprint(users[uIdx].id);
     users[uIdx].coupon = { code: seg.code, desc: seg.desc, tier: seg.tier, minAchat: seg.minAchat, used: false };
     DB.saveUsers(users);
     DB.setCurrent(users[uIdx]);
@@ -1973,8 +2042,13 @@ function updateWheelBanner() {
     cta.innerHTML = '<button class="wheel-banner-cta">Tourner maintenant →</button><div class="wheel-cta-hint">✨ Gratuit · Sans engagement</div><div class="wheel-cta-dots"><div class="wcd on"></div><div class="wcd on"></div><div class="wcd on"></div><div class="wcd"></div><div class="wcd"></div></div>';
   } else if (!canSpin(user)) {
     const days = daysUntilNextSpin(user);
-    desc.innerHTML = `Prochaine tentative disponible dans ${days} jour(s) 🗓️`;
-    cta.innerHTML = `<span class="wheel-used-badge">⏳ ${days}j avant la prochaine tentative</span>`;
+    const last = new Date(user.lastSpin);
+    const nextDate = new Date(last.getTime() + 30*24*60*60*1000);
+    const diffMs = nextDate - new Date();
+    const diffH = Math.floor(diffMs / (1000*60*60)) % 24;
+    const dateStr = nextDate.toLocaleDateString('fr-FR', {day:'numeric',month:'long'});
+    desc.innerHTML = `Prochaine tentative le <strong style="color:#fff">${dateStr}</strong> — dans ${days}j ${diffH}h 🗓️`;
+    cta.innerHTML = `<span class="wheel-used-badge">⏳ ${days}j ${diffH}h restants</span>`;
   } else {
     desc.innerHTML = `Votre tentative est disponible, <strong style="color:#fff">${user.prenom}</strong> ! 🎡`;
     cta.innerHTML = '<button class="wheel-banner-cta">Jouer maintenant →</button><div class="wheel-cta-hint">✨ 1 tentative disponible</div><div class="wheel-cta-dots"><div class="wcd on"></div><div class="wcd on"></div><div class="wcd on"></div><div class="wcd on"></div><div class="wcd on"></div></div>';
