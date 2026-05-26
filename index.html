@@ -1191,6 +1191,7 @@ function t(k){return T[lang][k]||T.fr[k]||k;}
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let cart={}, cartOpen=false, curFilter='all', searchQ='', darkMode=true;
+let activeCoupon = null; // coupon actif dans le panier
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function getPrice(p,q){let v=p.t[0].p;for(const t of p.t)if(q>=t.q&&t.p!==null)v=t.p;return v;}
@@ -2174,7 +2175,7 @@ function initStripe() {
 function openStripePayment() {
   const items = Object.values(cart);
   if (!items.length) { showToast('Votre panier est vide 🌸'); return; }
-  const total = items.reduce((s, i) => s + i.pr * i.q, 0);
+  const { total } = getCartTotal();
   document.getElementById('stripe-amount-display').textContent = total + ' €';
   document.getElementById('stripe-overlay').classList.add('open');
   setTimeout(initStripe, 150);
@@ -2285,7 +2286,6 @@ document.getElementById('profile-overlay').addEventListener('click', function(e)
 // ══════════════════════════════════════════════════════════════════
 // COUPON SYSTEM
 // ══════════════════════════════════════════════════════════════════
-let activeCoupon = null;
 
 function getCouponDiscount(code, total) {
   const upperCode = code.toUpperCase().trim();
